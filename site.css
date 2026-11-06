@@ -1,0 +1,57 @@
+/* Shared styling for the TrekText demo pages (not needed by the component). */
+:root {
+  color-scheme: dark;
+  --orange: #FF9900;
+  --peach: #FFCC99;
+  --blue: #9999FF;
+  --dkblue: #9999CC;
+  --lilac: #CC99CC;
+  --rose: #CC6699;
+  --red: #CC6666;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: var(--dkblue);
+  font-family: "Antonio", "Arial Narrow", sans-serif;
+  font-size: 18px;
+}
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 40px; }
+main { margin: 16px 0; }
+section { margin-top: 28px; }
+
+.pill {
+  display: inline-flex; align-items: center;
+  border: 0; border-radius: 999px; padding: 0.4em 1.2em;
+  color: #000; font: inherit; letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; cursor: default;
+}
+button.pill { cursor: pointer; }
+button.pill:hover { filter: brightness(1.15); }
+button.pill:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.pill a { color: inherit; text-decoration: none; }
+.pill a:hover { text-decoration: underline; }
+.orange { background: var(--orange); }
+.blue { background: var(--blue); }
+.dkblue { background: var(--dkblue); }
+.lilac { background: var(--lilac); }
+.rose { background: var(--rose); }
+.peach { background: var(--peach); }
+
+.lcars-head, .lcars-foot { display: flex; gap: 6px; align-items: stretch; height: 44px; }
+.lcars-head .pill { font-size: 1.3em; }
+.lcars-head .orange { border-radius: 22px 0 0 22px; }
+.lcars-foot { height: 34px; }
+.fill { flex: 1; background: var(--lilac); }
+.lcars-foot .fill { background: var(--dkblue); opacity: 0.5; }
+
+.section-head { display: flex; align-items: center; gap: 10px; }
+.section-head .label { color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.1em; }
+.section-head .rule { flex: 1; height: 10px; border-radius: 5px; background: var(--dkblue); opacity: 0.5; }
+
+@media (max-width: 560px) {
+  .lcars-head .blue, .lcars-head .fill { display: none; }
+  .lcars-head .orange { flex: 1; border-radius: 22px; }
+}

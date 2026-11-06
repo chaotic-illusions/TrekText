@@ -1,0 +1,13 @@
+# Original 2002 applet: kept locally for reference, not published
+/original/
+/TrekText.jar
+/tBeep.au
+*.class
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+
+# Local Claude Code settings
+.claude/settings.local.json

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrekText PADD</title>
+  <meta name="description" content="An LCARS-style PADD text display, rebuilt for modern browsers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script src="trek-padd.js"></script>
+  <style>
+    trek-padd { height: 440px; }
+    .codes { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+    .codes button { padding: 0.35em 0.9em; }
+    .codes code { font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; margin-right: 0.4em; }
+    textarea {
+      box-sizing: border-box; width: 100%; min-height: 220px; resize: vertical;
+      background: #0a0a12; color: var(--blue); border: 2px solid var(--dkblue); border-radius: 12px;
+      padding: 12px; font: 14px/1.5 ui-monospace, Consolas, monospace;
+    }
+    textarea:focus { outline: none; border-color: var(--orange); }
+    .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; align-items: center; }
+    .actions .hint { flex: 1; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="lcars-head">
+      <span class="pill orange">TrekText</span>
+      <span class="fill"></span>
+      <span class="pill blue">PADD Display System</span>
+    </header>
+
+    <main>
+      <trek-padd id="padd">
+        <script type="text/plain">
+##pSUBSPACE COMMUNICATIONS OPEN - ##yDOWNLOADING HISTORICAL FILE
+##rCRYMSON'S ILLUSION V3.0 WORLD WIDE WEB ACCESS - ##PCONSOLE 1648 ONLINE
+
+##bWELCOME TO CRYMSON'S ILLUSION.  THE THIRD VERSION TO GRACE THE GREAT VOID KNOWN AS THE WORLD WIDE WEB.  NEWLY REVAMPED INTERFACE ALLOWS FOR LCARS LAYOUT SYMBOLIC OF STAR TREK: THE NEXT GENERATION.  ALL OTHER LIBRARY COMPUTER FUNCTIONS MAY BE ACCESSED BY FUNCTION KEYS ON UPPER PORTION OF DISPLAY.
+
+RECENT UPDATES AS OF ##O2002.10.23
+
+##bNEWEST APPLET VERSION ##o(1.44) ##bIS UP AND RUNNING.  IT WILL CONTINUALLY REPEAT THE TEXT FILE AT ##o10 ##bSECOND INTERVALS.  IF YOU WISH TO PAUSE THE SCROLLING, SIMPLY CLICK IN THE APPLET WINDOW.  TO RESUME, CLICK AGAIN.
+
+IN ADDITION, THIS VERSION SUPPORTS THE ADDITION OF ##rD##oY##ON##yA##bM##BI##pC ##PC##rO##oL##OO##yR ##bWHICH I THINK IS PRETTY DAMN NEAT.  ALSO NOTE:  YOU SHOULD BE GETTING SOUND PLAYING WITH THIS APPLET.  IF YOU DO NOT, PLEASE POINT YOUR BROWSER TO ##oHTTP://JAVA.SUN.COM ##bAND DOWNLOAD THEIR NEWEST JAVA VIRTUAL MACHINE.  ONCE IT IS INSTALLED, YOU WILL EXPERIENCE THE ULTIMATE STAR TREK APPLET.
+
+IF YOU HAVE ANY QUESTIONS OR COMMENTS, PLEASE FEEL FREE TO SUBMIT THEM TO COMMAND AT ##rCRYMSON@SYCRAFT.ORG
+        </script>
+      </trek-padd>
+
+      <section>
+        <div class="section-head"><span class="label">Text input</span><span class="rule"></span></div>
+        <div class="codes" id="codes" role="toolbar" aria-label="Insert a colour code"></div>
+        <textarea id="source" spellcheck="false" aria-label="PADD text with colour codes"></textarea>
+        <div class="actions">
+          <span class="hint">Click a colour to insert its code. Ctrl+Enter to transmit.</span>
+          <button type="button" class="pill lilac" id="reset">Reset</button>
+          <button type="button" class="pill orange" id="transmit">Transmit</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="lcars-foot">
+      <span class="pill dkblue"><a href="fonts.html">Font specimens</a></span>
+      <span class="fill"></span>
+      <span class="pill rose"><a href="https://github.com/chaotic-illusions/TrekText">Source</a></span>
+    </footer>
+  </div>
+
+  <script>
+    const padd = document.getElementById("padd");
+    const source = document.getElementById("source");
+    const original = TrekPadd.dedent(padd.querySelector("script").textContent);
+    source.value = original;
+
+    const codes = document.getElementById("codes");
+    for (const [code, { name, hex }] of Object.entries(TrekPadd.COLORS)) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pill";
+      btn.style.background = hex;
+      btn.innerHTML = `<code>##${code}</code>${name.replace("-", " ")}`;
+      btn.addEventListener("click", () => {
+        source.setRangeText(`##${code}`, source.selectionStart, source.selectionEnd, "end");
+        source.focus();
+      });
+      codes.append(btn);
+    }
+
+    const transmit = () => { padd.text = source.value; };
+    document.getElementById("transmit").addEventListener("click", transmit);
+    document.getElementById("reset").addEventListener("click", () => {
+      source.value = original;
+      transmit();
+    });
+    source.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        transmit();
+      }
+    });
+  </script>
+</body>
+</html>

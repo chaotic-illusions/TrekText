@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrekText Font Specimens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600&family=Oswald:wght@400&family=Barlow+Condensed:wght@500&family=Barlow+Semi+Condensed:wght@500&family=Roboto+Condensed:wght@400&family=Saira+Semi+Condensed:wght@500&family=Fjalla+One&family=League+Gothic&family=Pathway+Gothic+One&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script src="trek-padd.js"></script>
+  <style>
+    trek-padd { height: 300px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 12px 0; }
+    .controls label { display: flex; gap: 8px; align-items: center; }
+    pre.css {
+      margin: 0; flex: 1; min-width: 260px; overflow-x: auto;
+      background: #0a0a12; color: var(--peach); border-radius: 12px; padding: 10px 14px;
+      font: 13px/1.5 ui-monospace, Consolas, monospace;
+    }
+    .cards { display: grid; gap: 14px; margin-top: 14px; }
+    .card {
+      display: block; width: 100%; text-align: left; cursor: pointer;
+      background: #000; border: 2px solid #222; border-radius: 14px; padding: 12px 16px 14px;
+      color: inherit; font: inherit;
+    }
+    .card:hover { border-color: var(--dkblue); }
+    .card[aria-pressed="true"] { border-color: var(--orange); }
+    .card:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .card h2 { margin: 0 0 2px; font: 600 1em "Antonio", sans-serif; color: var(--orange); letter-spacing: 0.06em; text-transform: uppercase; }
+    .card .note { margin: 0 0 10px; font-size: 0.85em; }
+    .card .sample { font-size: 22px; line-height: 1.25; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="lcars-head">
+      <span class="pill orange">Font specimens</span>
+      <span class="fill"></span>
+      <span class="pill blue"><a href="index.html">PADD demo</a></span>
+    </header>
+
+    <main>
+      <p>All fonts below are free (SIL Open Font License) via Google Fonts. Pick one to try it in the live PADD. They are ordered from most to least condensed.</p>
+
+      <trek-padd id="padd" hold="0" muted></trek-padd>
+
+      <div class="controls">
+        <label>Size <input type="range" id="size" min="14" max="36" value="22"> <span id="size-out">22px</span></label>
+        <pre class="css" id="css"></pre>
+      </div>
+
+      <div class="cards" id="cards"></div>
+    </main>
+  </div>
+
+  <script>
+    const FONTS = [
+      { family: "League Gothic", weight: 400, note: "Very condensed. Closest to the original 2002 bitmap font." },
+      { family: "Pathway Gothic One", weight: 400, note: "Very condensed, lighter strokes." },
+      { family: "Antonio", weight: 400, note: "Condensed. The usual choice for LCARS fan sites." },
+      { family: "Oswald", weight: 400, note: "Condensed and sturdy." },
+      { family: "Fjalla One", weight: 400, note: "Medium condensed, punchy display face." },
+      { family: "Barlow Condensed", weight: 500, note: "Condensed, slightly rounded, very readable." },
+      { family: "Roboto Condensed", weight: 400, note: "Condensed, neutral." },
+      { family: "Saira Semi Condensed", weight: 500, note: "Semi-condensed with squared-off, futuristic curves." },
+      { family: "Barlow Semi Condensed", weight: 500, note: "Semi-condensed. The widest option here." },
+    ];
+
+    const SAMPLE = [
+      "##pSUBSPACE COMMUNICATIONS OPEN - ##yDOWNLOADING HISTORICAL FILE",
+      "##bWELCOME TO CRYMSON'S ILLUSION. NEWLY REVAMPED INTERFACE ALLOWS FOR LCARS LAYOUT SYMBOLIC OF STAR TREK: THE NEXT GENERATION.",
+      "##rD##oY##ON##yA##bM##BI##pC ##PC##rO##oL##OO##yR  ##B0123456789  ##oSTARDATE 41153.7",
+      "##bMixed case: The quick brown fox jumps over the lazy dog.",
+    ].join("\n");
+
+    const padd = document.getElementById("padd");
+    const css = document.getElementById("css");
+    const size = document.getElementById("size");
+    const sizeOut = document.getElementById("size-out");
+    const cards = document.getElementById("cards");
+    padd.text = SAMPLE + "\n\n" + SAMPLE;
+
+    let current = FONTS[2];
+    function apply() {
+      padd.style.setProperty("--padd-font", `"${current.family}", sans-serif`);
+      padd.style.setProperty("--padd-font-weight", current.weight);
+      padd.style.setProperty("--padd-font-size", `${size.value}px`);
+      sizeOut.textContent = `${size.value}px`;
+      css.textContent =
+        `trek-padd {\n  --padd-font: "${current.family}", sans-serif;\n` +
+        `  --padd-font-weight: ${current.weight};\n  --padd-font-size: ${size.value}px;\n}`;
+      for (const card of cards.children) {
+        card.setAttribute("aria-pressed", String(card.dataset.family === current.family));
+      }
+    }
+
+    for (const font of FONTS) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "card";
+      card.dataset.family = font.family;
+      card.innerHTML = `<h2></h2><p class="note"></p><div class="sample"></div>`;
+      card.querySelector("h2").textContent = `${font.family} ${font.weight}`;
+      card.querySelector(".note").textContent = font.note;
+      const sample = card.querySelector(".sample");
+      sample.style.fontFamily = `"${font.family}", sans-serif`;
+      sample.style.fontWeight = font.weight;
+      sample.append(TrekPadd.toFragment(SAMPLE));
+      card.addEventListener("click", () => {
+        current = font;
+        apply();
+        padd.restart();
+      });
+      cards.append(card);
+    }
+    size.addEventListener("input", apply);
+    apply();
+  </script>
+</body>
+</html>
