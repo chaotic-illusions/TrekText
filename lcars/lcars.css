@@ -249,6 +249,24 @@
   padding: calc(6 * var(--u)) 0 calc(6 * var(--u)) calc(12 * var(--u));
 }
 
+/* .flip: the mirror image, with the sidebar on the right. */
+.lcars-frame.flip { grid-template-columns: minmax(0, 1fr) var(--arm) var(--side); }
+.lcars-frame.flip > .side { grid-column: 3; }
+.lcars-frame.flip > .top,
+.lcars-frame.flip > .bottom { grid-column: 1; padding-left: 0; padding-right: var(--gap); }
+.lcars-frame.flip > .content { grid-column: 1 / 3; padding: calc(6 * var(--u)) calc(12 * var(--u)) calc(6 * var(--u)) 0; }
+.lcars-frame.flip .side > .seg { justify-content: flex-start; text-align: left; }
+.lcars-frame.flip .side > .elbow-top { border-top-left-radius: 0; border-top-right-radius: var(--outer-x) var(--outer-y); }
+.lcars-frame.flip .side > .elbow-bottom { border-bottom-left-radius: 0; border-bottom-right-radius: var(--outer-x) var(--outer-y); }
+.lcars-frame.flip .side > :is(.elbow-top, .elbow-bottom)::before,
+.lcars-frame.flip .side > :is(.elbow-top, .elbow-bottom)::after { left: auto; right: 100%; }
+.lcars-frame.flip .side > .elbow-top::after {
+  background: radial-gradient(circle at 0% 100%, transparent var(--inner), var(--c, var(--lcars-blue-bell)) calc(var(--inner) + 0.5px));
+}
+.lcars-frame.flip .side > .elbow-bottom::after {
+  background: radial-gradient(circle at 0% 0%, transparent var(--inner), var(--c, var(--lcars-blue-bell)) calc(var(--inner) + 0.5px));
+}
+
 /* ------------------------------------------------------------------ *
  * Content holders
  * ------------------------------------------------------------------ */
@@ -269,6 +287,7 @@
   --padd-font-size: calc(24 * var(--u));
   --padd-padding: 0 calc(8 * var(--u)) 0 calc(4 * var(--u));
 }
+.lcars-frame.flip > .content > trek-padd { inset: calc(6 * var(--u)) calc(12 * var(--u)) calc(6 * var(--u)) 0; }
 
 /* ------------------------------------------------------------------ *
  * Narrow screens: one column, wrapping buttons, slimmer frames
