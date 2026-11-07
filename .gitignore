@@ -20,3 +20,6 @@ Thumbs.db
 
 # Backups written by tools/convert_codes.py
 *.bak
+
+# Python
+__pycache__/
