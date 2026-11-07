@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrekText Motion Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="lcars/palette.css">
+  <link rel="stylesheet" href="lcars/motion.css">
+  <script src="trek-padd.js"></script>
+  <script src="lcars/motion.js" defer></script>
+  <style>
+    body {
+      font-family: "Helvetica Ultra Compressed", "Antonio", "Arial Narrow", sans-serif;
+      text-transform: uppercase; letter-spacing: 0.03em; font-size: 20px; line-height: 1.2;
+    }
+    a { color: var(--lcars-ghost); }
+    code { text-transform: none; letter-spacing: 0; font-size: 0.8em; }
+    .lcars-head .title { margin: 0 4px; color: var(--orange); font-size: 40px; font-weight: 400; line-height: 44px; white-space: nowrap; letter-spacing: 0.02em; }
+    .sep { display: inline-block; width: 0.16em; height: 0.16em; border-radius: 50%; background: currentColor; vertical-align: 0.276em; margin: 0 0.3em; }
+    .section-head .label { font-size: 26px; }
+    p.intro { max-width: 80ch; font-size: 18px; }
+
+    /* Controls */
+    .controls { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 14px 0 4px; align-items: center; }
+    .controls .set { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .controls .set > span { color: var(--lcars-blue-bell); font-size: 16px; margin-right: 2px; }
+    .controls .pill { font-size: 16px; }
+    .controls .pill[aria-pressed="true"] { background: var(--orange); }
+    .controls .pill[aria-pressed="false"] { background: #333; color: #aaa; }
+    .controls .pill[data-alert-btn="red"][aria-pressed="true"] { background: var(--lcars-red-alert-2); }
+    .controls .pill[data-alert-btn="yellow"][aria-pressed="true"] { background: var(--lcars-yellow-alert-2); }
+    .controls .pill[data-alert-btn="blue"][aria-pressed="true"] { background: var(--lcars-nemesis-blue); }
+
+    /* Demo screen */
+    .screen {
+      display: grid; grid-template-columns: 150px 1fr; grid-template-rows: 64px minmax(220px, auto) 64px; gap: 5px;
+      margin-top: 14px; color: #000;
+    }
+    .screen > *, .screen .bars > *, .screen .side > * { --c: var(--c0); }
+    .elb { background: var(--c); position: relative; }
+    .elb::after { content: ""; position: absolute; right: 0; width: calc(100% - 110px); height: calc(100% - 20px); background: #000; }
+    .elb.top { border-top-left-radius: 40px; }
+    .elb.top::after { bottom: 0; border-top-left-radius: 18px; }
+    .elb.bottom { border-bottom-left-radius: 40px; }
+    .elb.bottom::after { top: 0; border-bottom-left-radius: 18px; }
+    .elb span { position: absolute; left: 10px; font-size: 15px; }
+    .elb.top span { bottom: 4px; }
+    .elb.bottom span { top: 4px; }
+    .bars { display: flex; gap: 5px; height: 20px; align-items: stretch; }
+    .bars.top { align-self: start; }
+    .bars.bottom { align-self: end; }
+    .bars > i { background: var(--c); }
+    .bars .t { flex: none; color: var(--lcars-atomic-tangerine); font-size: 30px; line-height: 20px; padding: 0 6px; background: none; }
+    .side { display: flex; flex-direction: column; gap: 5px; width: 110px; }
+    .side > button {
+      flex: 1; border: 0; background: var(--c); color: #000; font: inherit; font-size: 15px; text-align: right;
+      display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 8px 4px; cursor: pointer;
+    }
+    .side > button:hover { filter: brightness(1.15); }
+    .content { display: grid; grid-template-columns: 1fr 150px; gap: 10px 16px; padding: 10px 6px; align-content: start; }
+    .content .head { grid-column: 1 / -1; color: var(--lcars-atomic-tangerine); font-size: 26px; }
+    .content .readout { font-size: 19px; line-height: 1.3; word-spacing: 0.4em; }
+    .content .lines { color: var(--lcars-melrose); font-size: 17px; }
+    .content .m-meter { grid-column: 1 / -1; height: 16px; }
+    .content .m-scope { grid-row: span 2; align-self: start; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; margin-top: 12px; }
+    .card { border: 2px solid #1c1c24; border-radius: 14px; padding: 10px 14px 12px; display: grid; gap: 8px; align-content: start; }
+    .card h3 { margin: 0; font-weight: 400; font-size: 24px; color: var(--lcars-atomic-tangerine); display: flex; justify-content: space-between; gap: 8px; }
+    .card h3 .tag { font-size: 13px; align-self: center; background: #333; color: #ccc; border-radius: 999px; padding: 1px 9px; letter-spacing: 0.05em; }
+    .card h3 .tag.have { background: var(--lcars-green-apple, #6c6); color: #000; }
+    .card p { margin: 0; font-size: 16px; color: #ccc; }
+    .card .from { font-size: 14px; color: var(--lcars-blue-bell); }
+    .card .use { font-size: 14px; color: #888; }
+    .stage { display: flex; align-items: center; gap: 8px; min-height: 70px; }
+    .stage.tall { min-height: 160px; }
+    .demo { --c: var(--c0, var(--lcars-atomic-tangerine)); background: var(--c); color: #000; }
+    .demo.pill-btn { height: 46px; flex: 0 0 120px; border-radius: 23px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 16px 5px; font-size: 16px; }
+    .demo.bar { height: 22px; flex: 1; }
+    .demo.block { height: 46px; flex: 1; display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 8px 4px; font-size: 16px; }
+    button.demo { border: 0; font: inherit; cursor: pointer; }
+    button.demo:hover { filter: brightness(1.15); }
+    button.demo:active { filter: brightness(0.8); }
+    .replay { cursor: pointer; }
+    .hint { font-size: 13px; color: #777; }
+
+    .blink-demo { animation: blink-demo 1s infinite; }
+    @keyframes blink-demo { 0% { opacity: 1; animation-timing-function: steps(1, end); } 50% { opacity: 0.15; animation-timing-function: steps(1, end); } }
+
+    .meters { display: grid; gap: 10px; width: 100%; }
+    .meters .m-meter { height: 16px; }
+    .meters .row { display: flex; gap: 10px; align-items: center; }
+    .meters .row span { flex: 0 0 52px; font-size: 14px; color: var(--lcars-blue-bell); }
+    .meters .row .m-meter { flex: 1; }
+    .verticals { display: flex; gap: 22px; align-items: stretch; height: 150px; justify-content: center; width: 100%; }
+    .verticals figure { margin: 0; display: grid; grid-template-rows: 1fr auto; gap: 4px; justify-items: center; }
+    .verticals .m-meter { width: 26px; }
+    .verticals .m-level { width: 120px; --m-gap: 3px; }
+    .verticals figcaption { font-size: 14px; color: var(--lcars-blue-bell); }
+
+    .cascade { display: flex; gap: 12px; justify-content: flex-end; height: 140px; overflow: hidden; width: 100%; color: var(--lcars-sandy-brown); font-size: 14px; line-height: 1.2; --c2: var(--lcars-frozen-pond); }
+    .cascade .cc { display: flex; flex-direction: column; text-align: right; }
+
+    .scope-wrap { width: 160px; margin: 0 auto; }
+    .scan-box { width: 100%; aspect-ratio: 16 / 9; background: #000; border: 2px solid var(--lcars-blue-bell); border-radius: 4px; }
+    .scan-box svg { display: block; width: 100%; height: 100%; }
+
+    .alert-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+    .alert-row .m-alert { height: 130px; }
+    .m-al-title { font-size: 15cqh; }
+
+    .sources { font-size: 16px; color: #ccc; max-width: 85ch; }
+    .sources li { margin: 4px 0; }
+    .sources code { color: #aaa; }
+    @media (max-width: 760px) {
+      .lcars-head .title { font-size: 26px; } .lcars-head .fill { display: none; }
+      .screen { grid-template-columns: 90px 1fr; height: 300px; }
+      .elb::after { width: calc(100% - 70px); }
+      .side { width: 70px; }
+      .content { grid-template-columns: 1fr; }
+      .content .m-scope { display: none; }
+      .alert-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="lcars-head">
+      <span class="pill orange">Motion</span>
+      <span class="fill"></span>
+      <h1 class="title">LCARS 23801<span class="sep" aria-hidden="true"></span>Motion Review<span class="sep" aria-hidden="true"></span>Active</h1>
+      <span class="pill blue"><a href="picks.html">Palette</a></span>
+    </header>
+
+    <main>
+      <p class="intro">Animations to make a page feel alive, each in TrekText's own style. Everything here is plain CSS, with a small
+        helper script for power-up, readouts and alerts. None of it is wired into the builder yet: pick the ones you want and
+        they become choices in each piece's Effects section. If your system's "reduce motion" setting is on, everything here
+        holds still.</p>
+
+      <div class="controls">
+        <div class="set" role="group" aria-label="Speed"><span>Speed</span>
+          <button type="button" class="pill" data-speed="m-slow" aria-pressed="false">Slow</button>
+          <button type="button" class="pill" data-speed="" aria-pressed="true">Normal</button>
+          <button type="button" class="pill" data-speed="m-fast" aria-pressed="false">Fast</button>
+        </div>
+        <div class="set" role="group" aria-label="Condition"><span>Condition</span>
+          <button type="button" class="pill" data-alert-btn="" aria-pressed="true">Normal</button>
+          <button type="button" class="pill" data-alert-btn="yellow" aria-pressed="false">Yellow</button>
+          <button type="button" class="pill" data-alert-btn="red" aria-pressed="false">Red</button>
+          <button type="button" class="pill" data-alert-btn="blue" aria-pressed="false">Blue</button>
+        </div>
+        <div class="set"><span>Alert sound</span>
+          <button type="button" class="pill" id="sound" aria-pressed="false">Off</button>
+        </div>
+        <div class="set">
+          <button type="button" class="pill lilac" id="replay">Replay power-up</button>
+        </div>
+      </div>
+
+      <!-- A small screen that uses most of the effects together. -->
+      <div class="screen" id="screen" data-boot>
+        <div class="elb top m-in-key m-alertable" style="--c0: var(--lcars-atomic-tangerine)"><span>02-1701</span></div>
+        <div class="bars top m-in-wipe-r">
+          <i class="m-alertable" style="flex: 5; --c0: var(--lcars-tanoi)"></i>
+          <i class="m-alertable m-shift" style="flex: 1; --c0: var(--lcars-lilac); --mc: var(--lcars-hopbush)"></i>
+          <span class="t">Sensor analysis</span>
+          <i class="m-alertable" style="flex: 0 0 26px; border-radius: 0 10px 10px 0; --c0: var(--lcars-blue-bell)"></i>
+        </div>
+        <div class="side m-in-wipe-d">
+          <button type="button" class="m-alertable m-press" data-beep style="--c0: var(--lcars-melrose)">03-4471</button>
+          <button type="button" class="m-alertable m-press m-pulse" data-beep style="--c0: var(--lcars-golden-tanoi)">04-2259</button>
+          <button type="button" class="m-alertable m-press" data-beep style="--c0: var(--lcars-lilac)">05-0947</button>
+          <button type="button" class="m-alertable m-press" data-beep style="--c0: var(--lcars-sandy-brown); flex: 2.4">06-3318</button>
+        </div>
+        <div class="content">
+          <div class="head m-in-key">Long range scan<span class="sep"></span>Sector 21503</div>
+          <div class="readout m-readout m-in-key">0471 22 9105 47 3341 08 774 1260 55 3048 197 62 4410 88 0927 316</div>
+          <div class="m-scope m-in-grow" style="width: 150px"><i style="--a: 52; --r: 0.62"></i><i style="--a: 140; --r: 0.34"></i><i style="--a: 228; --r: 0.8"></i><i style="--a: 300; --r: 0.48"></i></div>
+          <div class="lines m-in-key">Subspace field stable<span class="sep"></span>Contacts four<span class="sep"></span>Range 3.2 light years</div>
+          <div class="m-meter m-comet round m-in-grow" data-segments="24" style="--c: var(--lcars-blue-bell)"></div>
+        </div>
+        <div class="elb bottom m-in-key m-alertable" style="--c0: var(--lcars-chestnut-rose)"><span>07-5520</span></div>
+        <div class="bars bottom m-in-wipe-r">
+          <i class="m-alertable" style="flex: 1; --c0: var(--lcars-melrose)"></i>
+          <i class="m-alertable m-flow" style="flex: 4; --c0: var(--lcars-sandy-brown)"></i>
+          <i class="m-alertable" style="flex: 0 0 26px; border-radius: 0 10px 10px 0; --c0: var(--lcars-tanoi)"></i>
+        </div>
+      </div>
+      <p class="hint">The sidebar buttons beep and flash when pressed. Try the condition buttons above.</p>
+
+      <section>
+        <div class="section-head"><span class="label">Ambient</span><span class="rule"></span></div>
+        <div class="cards">
+          <div class="card">
+            <h3>Blink <span class="tag have">In builder</span></h3>
+            <div class="stage"><div class="demo pill-btn blink-demo">Alert</div><div class="demo bar blink-demo" style="--c0: var(--lcars-chestnut-rose)"></div></div>
+            <p>Hard on and off. The builder already has it, at slow, normal and fast.</p>
+            <div class="from">From: thelcars.com's "blinkies", status lights on the show</div>
+          </div>
+          <div class="card">
+            <h3>Pulse <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-pulse">Engage</div><div class="demo bar m-pulse" style="--c0: var(--lcars-melrose)"></div></div>
+            <p>The fill dims and recovers smoothly, like a panel drawing power. Gentler than a blink.</p>
+            <div class="from">From: thelcars.com's pulse classes</div>
+            <div class="use">Any piece with a fill</div>
+          </div>
+          <div class="card">
+            <h3>Flicker <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-flicker" style="--c0: var(--lcars-golden-tanoi)">Aux power</div><div class="demo bar m-flicker" style="--c0: var(--lcars-tanoi)"></div></div>
+            <p>Steady most of the time, with the odd stutter: a damaged or overloaded panel.</p>
+            <div class="from">Our own, for battle damage and Lower Decks moments</div>
+            <div class="use">Any piece</div>
+          </div>
+          <div class="card">
+            <h3>Shift <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-shift" style="--c0: var(--lcars-atomic-tangerine); --mc: var(--lcars-frozen-pond)">Comms</div><div class="demo bar m-shift" style="--c0: var(--lcars-lilac); --mc: var(--lcars-hopbush)"></div></div>
+            <p>Snaps to a second color and back on an uneven beat. The second color is picked per piece.</p>
+            <div class="from">From: the stepping color changes on thelcars.com's theme buttons</div>
+            <div class="use">Any piece with a fill</div>
+          </div>
+          <div class="card">
+            <h3>Shimmer <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-shimmer" style="--c0: var(--lcars-blue-bell)">Scan</div><div class="demo bar m-shimmer" style="--c0: var(--lcars-sandy-brown)"></div></div>
+            <p>A band of light sweeps across, then waits.</p>
+            <div class="from">From: the shimmer on TNG's polarized panels</div>
+            <div class="use">Blocks, buttons, text bars</div>
+          </div>
+          <div class="card">
+            <h3>Flow <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-flow" style="--c0: var(--lcars-sandy-brown)">Plasma</div><div class="demo bar m-flow" style="--c0: var(--lcars-tanoi)"></div></div>
+            <p>Soft ripples drift through the fill, as if something is running through it. Good for conduits and power bars.</p>
+            <div class="from">From: the "polar motion" film on the TNG sets: a spinning polarizer behind printed panels made only the filled areas seem to move</div>
+            <div class="use">Blocks, buttons, text bars</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="label">Buttons and power-up</span><span class="rule"></span></div>
+        <div class="cards">
+          <div class="card">
+            <h3>Press flash <span class="tag">New</span></h3>
+            <div class="stage">
+              <button type="button" class="demo pill-btn m-press" data-beep style="--c0: var(--lcars-melrose)">Press</button>
+              <button type="button" class="demo block m-press" data-beep style="--c0: var(--lcars-atomic-tangerine)">Or me</button>
+            </div>
+            <p>The button flares bright for an instant when pressed, with the beep. Today's buttons only darken.</p>
+            <div class="from">From: buttons lighting up under a finger on the show</div>
+            <div class="use">Buttons</div>
+          </div>
+          <div class="card replay" data-boot title="Click to replay">
+            <h3>Key on <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-in-key">Online</div><div class="demo bar m-in-key" style="--c0: var(--lcars-lilac)"></div><div class="demo bar m-in-key" style="--c0: var(--lcars-melrose)"></div></div>
+            <p>When the page opens, each piece comes on with a quick stutter, in reading order.</p>
+            <div class="from">Our own take on a display powering up</div>
+            <div class="use">Any piece (click the card to replay)</div>
+          </div>
+          <div class="card replay" data-boot title="Click to replay">
+            <h3>Wipe on <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo pill-btn m-in-wipe-r" style="--c0: var(--lcars-golden-tanoi)">Ready</div><div class="demo bar m-in-wipe-r" style="--c0: var(--lcars-tanoi)"></div><div class="demo bar m-in-wipe-l" style="--c0: var(--lcars-blue-bell)"></div></div>
+            <p>Pieces draw on from one end, in any of four directions, so bars seem to extend out of the elbows.</p>
+            <div class="from">From: Picard-era and Lower Decks screens building up piece by piece</div>
+            <div class="use">Any piece (click the card to replay)</div>
+          </div>
+          <div class="card replay" data-boot title="Click to replay">
+            <h3>Grow on <span class="tag">New</span></h3>
+            <div class="stage"><div class="demo bar m-in-grow" style="--c0: var(--lcars-chestnut-rose)"></div><div class="demo pill-btn m-in-grow" style="--c0: var(--lcars-hopbush)">Open</div></div>
+            <p>Opens out from the middle. Suits text bars and banners.</p>
+            <div class="from">Our own</div>
+            <div class="use">Any piece (click the card to replay)</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="label">Indicators</span><span class="rule"></span></div>
+        <div class="cards">
+          <div class="card">
+            <h3>Segment meter <span class="tag">New piece</span></h3>
+            <div class="stage">
+              <div class="meters">
+                <div class="row"><span>Comet</span><div class="m-meter m-comet round" data-segments="16" style="--c: var(--lcars-atomic-tangerine)"></div></div>
+                <div class="row"><span>Fill</span><div class="m-meter m-fill" data-segments="12" style="--c: var(--lcars-melrose)"></div></div>
+                <div class="row"><span>Scan</span><div class="m-meter m-scan round" data-segments="14" style="--c: var(--lcars-chestnut-rose)"></div></div>
+              </div>
+            </div>
+            <p>A row of segments that light in a pattern: a comet with a tail, filling and draining, or a light running back and forth.</p>
+            <div class="from">From: the lit segments and chase lights on show panels; fan projects' "running lights"</div>
+            <div class="use">New piece; segments, colors and pattern are set in the panel</div>
+          </div>
+          <div class="card">
+            <h3>Core and levels <span class="tag">New piece</span></h3>
+            <div class="stage tall">
+              <div class="verticals">
+                <figure><div class="m-meter m-core vertical" data-segments="15" style="--c: var(--lcars-ghost); --m-gap: 3px"></div><figcaption>Core</figcaption></figure>
+                <figure><div class="m-meter m-fill vertical round" data-segments="10" style="--c: var(--lcars-golden-tanoi)"></div><figcaption>Fill</figcaption></figure>
+                <figure><div class="m-meter m-level" data-segments="9" style="--c: var(--lcars-lilac)"></div><figcaption>Levels</figcaption></figure>
+              </div>
+            </div>
+            <p>The same meter stood on end. Core sends pulses out from the middle, like a warp core; Levels jump like a graph of live readings.</p>
+            <div class="from">From: engineering displays; the warp core's light pulses</div>
+            <div class="use">Same new piece, set to vertical</div>
+          </div>
+          <div class="card">
+            <h3>Readout <span class="tag">New piece</span></h3>
+            <div class="stage"><div class="m-readout" style="font-size: 22px; line-height: 1.3; word-spacing: 0.45em; --c: var(--lcars-melrose)">2271 08 6650 413 92 0047 58 3316 11 7804 265 39</div></div>
+            <p>Groups of numbers that keep updating in place, with the odd group lighting up. Unlike the cascade, nothing scrolls.</p>
+            <div class="from">From: the constantly changing number blocks on show panels</div>
+            <div class="use">New piece, or an option for text</div>
+          </div>
+          <div class="card">
+            <h3>Twinkle <span class="tag">New option</span></h3>
+            <div class="stage"><div class="cascade m-twinkle" id="cascade"></div></div>
+            <p>Numbers scattered through a cascade light up for a moment. Works with or without scrolling.</p>
+            <div class="from">From: the highlights passing through thelcars.com's data cascade</div>
+            <div class="use">Cascade</div>
+          </div>
+          <div class="card">
+            <h3>Sensor scope <span class="tag">New piece</span></h3>
+            <div class="stage tall"><div class="scope-wrap"><div class="m-scope"><i style="--a: 35; --r: 0.55"></i><i style="--a: 118; --r: 0.82"></i><i style="--a: 190; --r: 0.3"></i><i style="--a: 262; --r: 0.66"></i><i style="--a: 322; --r: 0.4"></i></div></div></div>
+            <p>Range rings with a sweeping arm. Contacts light up as the arm passes them.</p>
+            <div class="from">From: tactical and sensor displays; fan projects' radar sweeps</div>
+            <div class="use">New piece; contacts can be dragged into place</div>
+          </div>
+          <div class="card">
+            <h3>Scan line <span class="tag">New option</span></h3>
+            <div class="stage">
+              <div class="scan-box m-scanline">
+                <svg viewBox="0 0 320 180" aria-hidden="true" fill="none" stroke="var(--lcars-melrose)" stroke-width="1.2">
+                  <circle cx="110" cy="90" r="66"/>
+                  <ellipse cx="110" cy="90" rx="66" ry="22"/><ellipse cx="110" cy="90" rx="66" ry="46"/>
+                  <ellipse cx="110" cy="90" rx="22" ry="66"/><ellipse cx="110" cy="90" rx="46" ry="66"/>
+                  <line x1="44" y1="90" x2="176" y2="90"/><line x1="110" y1="24" x2="110" y2="156"/>
+                  <circle cx="148" cy="62" r="5" fill="var(--lcars-atomic-tangerine)" stroke="none"/>
+                  <path d="M148 62 L214 40 L296 40" stroke="var(--lcars-atomic-tangerine)"/>
+                  <g fill="var(--lcars-tanoi)" stroke="none" font-family="Antonio, sans-serif" font-size="13" letter-spacing="1">
+                    <text x="218" y="35">CLASS M</text><text x="218" y="62">ORBIT 2.4</text><text x="218" y="80">DIAM 12740</text><text x="218" y="98">ATMO N2 O2</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <p>A bright line with a glowing wake passes down over the picture, then waits. Looks like the picture is being scanned.</p>
+            <div class="from">From: scans and analysis readouts on the show</div>
+            <div class="use">Image, Frame</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="label">Alerts</span><span class="rule"></span></div>
+        <div class="cards">
+          <div class="card" style="grid-column: 1 / -1">
+            <h3>Alert banner <span class="tag">New piece</span></h3>
+            <div class="stage">
+              <div class="alert-row">
+                <div class="m-alert" style="--n: 4"><div class="m-al-bars up"></div><div class="m-al-title">Red alert</div><div class="m-al-bars down"></div></div>
+                <div class="m-alert" style="--n: 4; --c: var(--lcars-yellow-alert-2)"><div class="m-al-bars up"></div><div class="m-al-title">Yellow alert</div><div class="m-al-bars down"></div></div>
+                <div class="m-alert" style="--n: 4; --c: var(--lcars-nemesis-blue)"><div class="m-al-bars up"></div><div class="m-al-title">Blue alert</div><div class="m-al-bars down"></div></div>
+              </div>
+            </div>
+            <p>Bars above and below the title light up in waves running outward. The number of bars, the color and the title are set in the panel.</p>
+            <div class="from">From: the alert graphics on the show, drawn our own way</div>
+            <div class="use">New piece</div>
+          </div>
+          <div class="card" style="grid-column: 1 / -1">
+            <h3>Alert condition <span class="tag">New page setting</span></h3>
+            <p>Use the Condition buttons at the top. Every piece switches to that alert's colors and throbs, and red can sound a klaxon.
+              The klaxon is made in the browser, so there's no sound file to license. In the builder this would be a page setting, and a button
+              could switch the condition on and off.</p>
+            <div class="from">From: LCARS screens going red during alerts on every series</div>
+            <div class="use">Page setting, and a button action</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head"><span class="label">Research notes</span><span class="rule"></span></div>
+        <ul class="sources">
+          <li><a href="https://www.thelcars.com/html-elements.php">thelcars.com</a> uses blink and pulse classes at three speeds, buttons that step through colors on a timer,
+            a data cascade with highlights moving through its columns, and a beep on button press. Its license doesn't allow copying, so these
+            are rebuilt from the ideas, not the code.</li>
+          <li>On TNG most screens were backlit printed panels. The movement came from
+            <a href="https://wrathofdhanprops.blogspot.com/2018/06/okudagrams-part-iii-why-they-seem-to.html">polarized film with a spinning polarizer behind it</a>,
+            so only chosen areas seemed to shimmer and pulse. Real animation was mostly added in post-production. That's where Flow and Shimmer come from.</li>
+          <li>On DS9 and Voyager, real monitors on set ran animated graphics, most made by scenic artist James Van Over. Picard's screens use real
+            animation on HD monitors throughout.</li>
+          <li>Fan projects such as <a href="https://github.com/retronified/lcars-obsidian">LCARS for Obsidian</a>,
+            <a href="https://github.com/openfantasymap/lcars-core">lcars-core</a> and the <a href="https://www.github.com/Aricwithana/LCARS-SDK">LCARS SDK</a>
+            add running lights, warp core pulses, radar sweeps, alert conditions with text effects, transporter effects and staged boot sequences.
+            They inspired the meters, scope, power-up and alert condition.</li>
+        </ul>
+        <p class="sources">Ideas for later:</p>
+        <ul class="sources">
+          <li><b>Power flow</b>: a light pulse that leaves an elbow and runs along the bars attached to it.</li>
+          <li><b>Exit wipe</b>: when a button links to another page, the screen powers down in reverse order first.</li>
+          <li><b>Countdown</b>: a readout that counts down to zero, for self-destruct gags.</li>
+          <li><b>Power-up sound</b>: a soft rising chirp as the page draws on.</li>
+          <li><b>Cursor</b>: a blinking block at the end of a PADD's text while it waits.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="lcars-foot">
+      <span class="pill dkblue"><a href="index.html">PADD demo</a></span>
+      <span class="fill"></span>
+    </footer>
+  </div>
+
+  <script>
+    // Alert banner bars.
+    for (const a of document.querySelectorAll(".m-alert")) {
+      const n = Number(getComputedStyle(a).getPropertyValue("--n")) || 4;
+      for (const side of a.querySelectorAll(".m-al-bars")) {
+        side.innerHTML = Array.from({ length: n }, (_, i) => `<i style="--i:${i}"></i>`).join("");
+      }
+    }
+
+    // A small cascade of numbers.
+    (() => {
+      const box = document.getElementById("cascade");
+      let html = "";
+      for (let c = 0; c < 9; c++) {
+        const w = 1 + Math.floor(Math.random() * 5);
+        let col = "";
+        for (let r = 0; r < 12; r++) {
+          const len = Math.max(1, w - Math.floor(Math.random() * 2));
+          col += `<span>${String(Math.floor(Math.random() * 10 ** len)).padStart(len, "0")}</span>`;
+        }
+        html += `<div class="cc">${col}</div>`;
+      }
+      box.innerHTML = html;
+    })();
+
+    // Controls.
+    const press = (group, btn) => group.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+    const speeds = [...document.querySelectorAll("[data-speed]")];
+    speeds.forEach((b) => b.addEventListener("click", () => {
+      document.body.classList.remove("m-slow", "m-fast");
+      if (b.dataset.speed) document.body.classList.add(b.dataset.speed);
+      press(speeds, b);
+    }));
+
+    const sound = document.getElementById("sound");
+    sound.addEventListener("click", () => {
+      const on = sound.getAttribute("aria-pressed") !== "true";
+      sound.setAttribute("aria-pressed", String(on));
+      sound.textContent = on ? "On" : "Off";
+    });
+
+    const alerts = [...document.querySelectorAll("[data-alert-btn]")];
+    alerts.forEach((b) => b.addEventListener("click", () => {
+      LcarsMotion.alert(b.dataset.alertBtn || null, { sound: sound.getAttribute("aria-pressed") === "true" });
+      press(alerts, b);
+    }));
+
+    document.getElementById("replay").addEventListener("click", () => LcarsMotion.boot(document.getElementById("screen")));
+    document.querySelectorAll(".card.replay").forEach((c) => c.addEventListener("click", () => LcarsMotion.boot(c)));
+  </script>
+</body>
+</html>

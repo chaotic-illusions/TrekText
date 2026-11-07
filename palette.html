@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrekText Palette Proposal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script src="palette-data.js"></script>
+  <style>
+    /* LCARS convention: everything in capitals; hierarchy comes from size alone. */
+    body {
+      font-family: "Helvetica Ultra Compressed", "Antonio", "Arial Narrow", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+    code { text-transform: none; letter-spacing: 0; } /* color names are lowercase in text */
+    .lcars-head .title {
+      margin: 0 4px; color: var(--orange); font-size: 40px; font-weight: 400;
+      line-height: 44px; white-space: nowrap; letter-spacing: 0.02em;
+    }
+    /* Small dot centred on the cap height (0.712em in Helvetica Ultra Compressed). */
+    .sep {
+      display: inline-block; width: 0.16em; height: 0.16em; border-radius: 50%;
+      background: currentColor; vertical-align: 0.276em; margin: 0 0.3em;
+    }
+    .lcars-head .cap { font-size: 1em; }
+    .section-head .label { font-size: 26px; }
+    p.intro { max-width: 80ch; font-size: 18px; }
+    @media (max-width: 760px) { .lcars-head .title { font-size: 26px; } .lcars-head .fill { display: none; } }
+    .era { margin-top: 30px; }
+    .era .src { font-size: 16px; margin: 6px 0 10px; }
+    .era .src a { color: var(--blue); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+    .sw { display: flex; flex-direction: column; border: 2px solid #1c1c24; border-radius: 14px; overflow: hidden; }
+    .sw .chip { height: 34px; display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; color: #000; font-size: 15px; letter-spacing: 0.06em; }
+    .sw .body { padding: 8px 12px 10px; display: grid; gap: 3px; }
+    .sw .sample { font-size: 26px; line-height: 1.1; }
+    .sw .meta { display: flex; justify-content: space-between; gap: 6px; font-size: 15px; }
+    .sw code { font: 12px ui-monospace, Consolas, monospace; color: #aaa; }
+    .badge { border-radius: 999px; padding: 0 0.6em; color: #000; font-size: 0.8em; letter-spacing: 0.05em; white-space: nowrap; }
+    .b-text { background: #99cc99; }
+    .b-large { background: #ffcc66; }
+    .b-panel { background: #666; color: #ddd; }
+    .b-use { background: var(--orange); }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 16px; margin: 10px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 18px; }
+    th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #222; }
+    th { color: var(--orange); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; }
+    td code { font: 14px ui-monospace, Consolas, monospace; }
+    .dot { display: inline-block; width: 0.9em; height: 0.9em; border-radius: 50%; vertical-align: -0.1em; margin-right: 6px; }
+    .table-wrap { overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="lcars-head">
+      <span class="pill orange">Palette</span>
+      <span class="fill"></span>
+      <h1 class="title">LCARS 23801<span class="sep" aria-hidden="true"></span>Subspace Communications<span class="sep" aria-hidden="true"></span>Active</h1>
+      <span class="pill blue cap"><a href="picks.html">Your picks</a></span>
+    </header>
+
+    <main>
+      <p class="intro">LCARS colors were never published as official values, so every set below is sampled by fans from screen captures. Each swatch shows both LCARS uses: black lettering on a colored panel (top) and colored text on black (bottom).</p>
+      <div class="legend">
+        <span><span class="badge b-use">PICKED</span> one of your picks (see <a href="picks.html" style="color:inherit">picks</a>)</span>
+        <span><span class="badge b-panel">DIM</span> too dark to read either way (contrast below 3:1)</span>
+        <span>Use any color in text by name, for example <code>##{nemesis-blue}</code></span>
+      </div>
+
+      <div id="eras"></div>
+    </main>
+
+    <footer class="lcars-foot">
+      <span class="pill dkblue"><a href="fonts.html">Font specimens</a></span>
+      <span class="fill"></span>
+    </footer>
+  </div>
+
+  <script>
+    const { ERAS, PICKS } = window.LCARS_PALETTES;
+
+    function contrastOnBlack(hex) {
+      const ch = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+      const L = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+      return (L + 0.05) / 0.05;
+    }
+    function badge(hex, name) {
+      if (PICKS.includes(name)) return `<span class="badge b-use">PICKED</span>`;
+      if (contrastOnBlack(hex) < 3) return `<span class="badge b-panel">DIM</span>`;
+      return "";
+    }
+
+    const eras = document.getElementById("eras");
+    for (const era of ERAS) {
+      const sec = document.createElement("section");
+      sec.className = "era";
+      sec.innerHTML = `<div class="section-head"><span class="label"></span><span class="rule"></span></div>
+        <p class="src">${era.src}</p><div class="grid"></div>`;
+      sec.querySelector(".label").textContent = era.title;
+      const grid = sec.querySelector(".grid");
+      for (const [name, hex] of era.colors) {
+        const sw = document.createElement("div");
+        sw.className = "sw";
+        sw.title = `##{${name}}`;
+        sw.innerHTML = `<div class="chip" style="background:${hex}">${name.toUpperCase()}</div>
+          <div class="body">
+            <div class="sample" style="color:${hex}">${name.toUpperCase()}</div>
+            <div class="meta"><code>${hex}</code>${badge(hex, name)}</div>
+          </div>`;
+        grid.append(sw);
+      }
+      eras.append(sec);
+    }
+  </script>
+</body>
+</html>

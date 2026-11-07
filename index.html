@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600&display=swap">
   <link rel="stylesheet" href="site.css">
   <script src="trek-padd.js"></script>
+  <script src="palette-data.js"></script>
   <style>
     trek-padd { height: 440px; }
     .codes { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
@@ -36,18 +37,18 @@
     <main>
       <trek-padd id="padd">
         <script type="text/plain">
-##pSUBSPACE COMMUNICATIONS OPEN - ##yDOWNLOADING HISTORICAL FILE
-##rCRYMSON'S ILLUSION V3.0 WORLD WIDE WEB ACCESS - ##PCONSOLE 1648 ONLINE
+##{lilac}SUBSPACE COMMUNICATIONS OPEN - ##{tanoi}DOWNLOADING HISTORICAL FILE
+##{chestnut-rose}CRYMSON'S ILLUSION V3.0 WORLD WIDE WEB ACCESS - ##{hopbush}CONSOLE 1648 ONLINE
 
-##bWELCOME TO CRYMSON'S ILLUSION.  THE THIRD VERSION TO GRACE THE GREAT VOID KNOWN AS THE WORLD WIDE WEB.  NEWLY REVAMPED INTERFACE ALLOWS FOR LCARS LAYOUT SYMBOLIC OF STAR TREK: THE NEXT GENERATION.  ALL OTHER LIBRARY COMPUTER FUNCTIONS MAY BE ACCESSED BY FUNCTION KEYS ON UPPER PORTION OF DISPLAY.
+##{melrose}WELCOME TO CRYMSON'S ILLUSION.  THE THIRD VERSION TO GRACE THE GREAT VOID KNOWN AS THE WORLD WIDE WEB.  NEWLY REVAMPED INTERFACE ALLOWS FOR LCARS LAYOUT SYMBOLIC OF STAR TREK: THE NEXT GENERATION.  ALL OTHER LIBRARY COMPUTER FUNCTIONS MAY BE ACCESSED BY FUNCTION KEYS ON UPPER PORTION OF DISPLAY.
 
-RECENT UPDATES AS OF ##O2002.10.23
+RECENT UPDATES AS OF ##{atomic-tangerine}2002.10.23
 
-##bNEWEST APPLET VERSION ##o(1.44) ##bIS UP AND RUNNING.  IT WILL CONTINUALLY REPEAT THE TEXT FILE AT ##o10 ##bSECOND INTERVALS.  IF YOU WISH TO PAUSE THE SCROLLING, SIMPLY CLICK IN THE APPLET WINDOW.  TO RESUME, CLICK AGAIN.
+##{melrose}NEWEST APPLET VERSION ##{sandy-brown}(1.44) ##{melrose}IS UP AND RUNNING.  IT WILL CONTINUALLY REPEAT THE TEXT FILE AT ##{sandy-brown}10 ##{melrose}SECOND INTERVALS.  IF YOU WISH TO PAUSE THE SCROLLING, SIMPLY CLICK IN THE APPLET WINDOW.  TO RESUME, CLICK AGAIN.
 
-IN ADDITION, THIS VERSION SUPPORTS THE ADDITION OF ##rD##oY##ON##yA##bM##BI##pC ##PC##rO##oL##OO##yR ##bWHICH I THINK IS PRETTY DAMN NEAT.  ALSO NOTE:  YOU SHOULD BE GETTING SOUND PLAYING WITH THIS APPLET.  IF YOU DO NOT, PLEASE POINT YOUR BROWSER TO ##oHTTP://JAVA.SUN.COM ##bAND DOWNLOAD THEIR NEWEST JAVA VIRTUAL MACHINE.  ONCE IT IS INSTALLED, YOU WILL EXPERIENCE THE ULTIMATE STAR TREK APPLET.
+IN ADDITION, THIS VERSION SUPPORTS THE ADDITION OF ##{chestnut-rose}D##{sandy-brown}Y##{atomic-tangerine}N##{tanoi}A##{melrose}M##{blue-bell}I##{lilac}C ##{hopbush}C##{chestnut-rose}O##{sandy-brown}L##{atomic-tangerine}O##{tanoi}R ##{melrose}WHICH I THINK IS PRETTY DAMN NEAT.  ALSO NOTE:  YOU SHOULD BE GETTING SOUND PLAYING WITH THIS APPLET.  IF YOU DO NOT, PLEASE POINT YOUR BROWSER TO ##{sandy-brown}HTTP://JAVA.SUN.COM ##{melrose}AND DOWNLOAD THEIR NEWEST JAVA VIRTUAL MACHINE.  ONCE IT IS INSTALLED, YOU WILL EXPERIENCE THE ULTIMATE STAR TREK APPLET.
 
-IF YOU HAVE ANY QUESTIONS OR COMMENTS, PLEASE FEEL FREE TO SUBMIT THEM TO COMMAND AT ##rCRYMSON@SYCRAFT.ORG
+IF YOU HAVE ANY QUESTIONS OR COMMENTS, PLEASE FEEL FREE TO SUBMIT THEM TO COMMAND AT ##{chestnut-rose}CRYMSON@SYCRAFT.ORG
         </script>
       </trek-padd>
 
@@ -65,6 +66,8 @@ IF YOU HAVE ANY QUESTIONS OR COMMENTS, PLEASE FEEL FREE TO SUBMIT THEM TO COMMAN
 
     <footer class="lcars-foot">
       <span class="pill dkblue"><a href="fonts.html">Font specimens</a></span>
+      <span class="pill lilac"><a href="picks.html">Palette picks</a></span>
+      <span class="pill peach"><a href="motion.html">Motion review</a></span>
       <span class="fill"></span>
       <span class="pill rose"><a href="https://github.com/chaotic-illusions/TrekText">Source</a></span>
     </footer>
@@ -77,14 +80,16 @@ IF YOU HAVE ANY QUESTIONS OR COMMENTS, PLEASE FEEL FREE TO SUBMIT THEM TO COMMAN
     source.value = original;
 
     const codes = document.getElementById("codes");
-    for (const [code, { name, hex }] of Object.entries(TrekPadd.COLORS)) {
+    // One button per picked color; each inserts its ##{name} code at the cursor.
+    for (const { name, hex } of LCARS_PALETTES.allColors().filter((c) => c.picked)) {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "pill";
       btn.style.background = hex;
-      btn.innerHTML = `<code>##${code}</code>${name.replace("-", " ")}`;
+      btn.title = `##{${name}}`;
+      btn.textContent = name.replace(/-/g, " ");
       btn.addEventListener("click", () => {
-        source.setRangeText(`##${code}`, source.selectionStart, source.selectionEnd, "end");
+        source.setRangeText(`##{${name}}`, source.selectionStart, source.selectionEnd, "end");
         source.focus();
       });
       codes.append(btn);

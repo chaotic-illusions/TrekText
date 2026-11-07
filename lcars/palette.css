@@ -1,0 +1,258 @@
+/*
+ * LCARS palette for TrekText: every color name, generated from palette-data.js
+ * by tools/build_palette.py. Do not edit by hand.
+ *
+ *   --lcars-<name>   the color itself
+ *   .t-<name>        text in that color (##{name} in labels)
+ *   .c-<name>        a piece drawn in that color
+ *
+ * Picks (26): blue-bell, melrose, lilac, hopbush, chestnut-rose, atomic-tangerine, golden-tanoi, tanoi, indigo, cosmic, bourbon, sandy-brown, frozen-pond, green-apple, silver, andorian-blue, pewter, red-alert-2, yellow-alert-2, cardinal, tangerine, red-damask, flat-dark-earth, nemesis-blue, ghost, lavender-purple
+ */
+:root {
+  --lcars-blue-bell: #9999CC;
+  --lcars-melrose: #9999FF;
+  --lcars-lilac: #CC99CC;
+  --lcars-hopbush: #CC6699;
+  --lcars-chestnut-rose: #CC6666;
+  --lcars-orange-peel: #FF9966;
+  --lcars-atomic-tangerine: #FF9900;
+  --lcars-tanoi: #FFCC99;
+  --lcars-golden-tanoi: #FFCC66;
+  --lcars-pale-canary: #FFFF99;
+  --lcars-neon-carrot: #FF9933;
+  --lcars-eggplant: #664466;
+  --lcars-anakiwa: #99CCFF;
+  --lcars-mariner: #3366CC;
+  --lcars-bahama-blue: #006699;
+  --lcars-danub: #6688CC;
+  --lcars-indigo: #4455BB;
+  --lcars-lavender-purple: #9977AA;
+  --lcars-cosmic: #774466;
+  --lcars-red-damask: #DD6644;
+  --lcars-medium-carmine: #AA5533;
+  --lcars-bourbon: #BB6622;
+  --lcars-sandy-brown: #EE9955;
+  --lcars-andorian-blue: #55A7FF;
+  --lcars-autumn-leaves: #FB9004;
+  --lcars-command-gold: #FFBB33;
+  --lcars-flat-dark-earth: #CC9966;
+  --lcars-frost: #99CCFF;
+  --lcars-frozen-pond: #E6F2FF;
+  --lcars-green-apple: #94B300;
+  --lcars-luna: #BEC2CF;
+  --lcars-pewter: #74788B;
+  --lcars-pumpkin-seed: #FFE1CA;
+  --lcars-red-alert: #FF3300;
+  --lcars-rust: #994400;
+  --lcars-salmon: #E98181;
+  --lcars-science-blue: #2288FF;
+  --lcars-silver: #828CAD;
+  --lcars-sky: #70B5FF;
+  --lcars-smoke: #585A68;
+  --lcars-fc-mauve: #C198B0;
+  --lcars-fc-terracotta: #B46757;
+  --lcars-fc-rose: #AE697D;
+  --lcars-fc-plum: #97567B;
+  --lcars-fc-amber: #C67825;
+  --lcars-fc-tan: #B28452;
+  --lcars-fc-olive: #C2B74B;
+  --lcars-fc-lavender: #BEBCDF;
+  --lcars-periwinkle: #CCDDFF;
+  --lcars-dodger-pale: #5599FF;
+  --lcars-dodger-soft: #3366FF;
+  --lcars-near-blue: #0011EE;
+  --lcars-navy-blue: #000088;
+  --lcars-husk: #BBAA55;
+  --lcars-nemesis-rust: #BB4411;
+  --lcars-tamarillo: #882211;
+  --lcars-nemesis-blue: #3786FF;
+  --lcars-nemesis-sky: #4BB0FF;
+  --lcars-nemesis-ice: #87EEFF;
+  --lcars-nemesis-orange: #D45F10;
+  --lcars-nemesis-sand: #DFAF71;
+  --lcars-ghost: #88BBFF;
+  --lcars-cool: #6699FF;
+  --lcars-evening: #2266FF;
+  --lcars-midnight: #0048F0;
+  --lcars-moonbeam: #EBF0FF;
+  --lcars-honey: #FFCC99;
+  --lcars-tangerine: #FF8833;
+  --lcars-washed-pumpkin: #FF7744;
+  --lcars-pumpkin: #E63D00;
+  --lcars-cardinal: #DA2537;
+  --lcars-red-copper: #CC6666;
+  --lcars-martian: #99CC33;
+  --lcars-sand: #D29270;
+  --lcars-wheat: #D1A16C;
+  --lcars-red-alert-1: #CD0000;
+  --lcars-red-alert-2: #FE0000;
+  --lcars-red-alert-pale: #FF9190;
+  --lcars-yellow-alert-1: #CD870E;
+  --lcars-yellow-alert-2: #FFA90E;
+  --lcars-yellow-alert-pale: #FFDA67;
+  --lcars-bg: #000;
+}
+
+.t-blue-bell { color: var(--lcars-blue-bell); }
+.t-melrose { color: var(--lcars-melrose); }
+.t-lilac { color: var(--lcars-lilac); }
+.t-hopbush { color: var(--lcars-hopbush); }
+.t-chestnut-rose { color: var(--lcars-chestnut-rose); }
+.t-orange-peel { color: var(--lcars-orange-peel); }
+.t-atomic-tangerine { color: var(--lcars-atomic-tangerine); }
+.t-tanoi { color: var(--lcars-tanoi); }
+.t-golden-tanoi { color: var(--lcars-golden-tanoi); }
+.t-pale-canary { color: var(--lcars-pale-canary); }
+.t-neon-carrot { color: var(--lcars-neon-carrot); }
+.t-eggplant { color: var(--lcars-eggplant); }
+.t-anakiwa { color: var(--lcars-anakiwa); }
+.t-mariner { color: var(--lcars-mariner); }
+.t-bahama-blue { color: var(--lcars-bahama-blue); }
+.t-danub { color: var(--lcars-danub); }
+.t-indigo { color: var(--lcars-indigo); }
+.t-lavender-purple { color: var(--lcars-lavender-purple); }
+.t-cosmic { color: var(--lcars-cosmic); }
+.t-red-damask { color: var(--lcars-red-damask); }
+.t-medium-carmine { color: var(--lcars-medium-carmine); }
+.t-bourbon { color: var(--lcars-bourbon); }
+.t-sandy-brown { color: var(--lcars-sandy-brown); }
+.t-andorian-blue { color: var(--lcars-andorian-blue); }
+.t-autumn-leaves { color: var(--lcars-autumn-leaves); }
+.t-command-gold { color: var(--lcars-command-gold); }
+.t-flat-dark-earth { color: var(--lcars-flat-dark-earth); }
+.t-frost { color: var(--lcars-frost); }
+.t-frozen-pond { color: var(--lcars-frozen-pond); }
+.t-green-apple { color: var(--lcars-green-apple); }
+.t-luna { color: var(--lcars-luna); }
+.t-pewter { color: var(--lcars-pewter); }
+.t-pumpkin-seed { color: var(--lcars-pumpkin-seed); }
+.t-red-alert { color: var(--lcars-red-alert); }
+.t-rust { color: var(--lcars-rust); }
+.t-salmon { color: var(--lcars-salmon); }
+.t-science-blue { color: var(--lcars-science-blue); }
+.t-silver { color: var(--lcars-silver); }
+.t-sky { color: var(--lcars-sky); }
+.t-smoke { color: var(--lcars-smoke); }
+.t-fc-mauve { color: var(--lcars-fc-mauve); }
+.t-fc-terracotta { color: var(--lcars-fc-terracotta); }
+.t-fc-rose { color: var(--lcars-fc-rose); }
+.t-fc-plum { color: var(--lcars-fc-plum); }
+.t-fc-amber { color: var(--lcars-fc-amber); }
+.t-fc-tan { color: var(--lcars-fc-tan); }
+.t-fc-olive { color: var(--lcars-fc-olive); }
+.t-fc-lavender { color: var(--lcars-fc-lavender); }
+.t-periwinkle { color: var(--lcars-periwinkle); }
+.t-dodger-pale { color: var(--lcars-dodger-pale); }
+.t-dodger-soft { color: var(--lcars-dodger-soft); }
+.t-near-blue { color: var(--lcars-near-blue); }
+.t-navy-blue { color: var(--lcars-navy-blue); }
+.t-husk { color: var(--lcars-husk); }
+.t-nemesis-rust { color: var(--lcars-nemesis-rust); }
+.t-tamarillo { color: var(--lcars-tamarillo); }
+.t-nemesis-blue { color: var(--lcars-nemesis-blue); }
+.t-nemesis-sky { color: var(--lcars-nemesis-sky); }
+.t-nemesis-ice { color: var(--lcars-nemesis-ice); }
+.t-nemesis-orange { color: var(--lcars-nemesis-orange); }
+.t-nemesis-sand { color: var(--lcars-nemesis-sand); }
+.t-ghost { color: var(--lcars-ghost); }
+.t-cool { color: var(--lcars-cool); }
+.t-evening { color: var(--lcars-evening); }
+.t-midnight { color: var(--lcars-midnight); }
+.t-moonbeam { color: var(--lcars-moonbeam); }
+.t-honey { color: var(--lcars-honey); }
+.t-tangerine { color: var(--lcars-tangerine); }
+.t-washed-pumpkin { color: var(--lcars-washed-pumpkin); }
+.t-pumpkin { color: var(--lcars-pumpkin); }
+.t-cardinal { color: var(--lcars-cardinal); }
+.t-red-copper { color: var(--lcars-red-copper); }
+.t-martian { color: var(--lcars-martian); }
+.t-sand { color: var(--lcars-sand); }
+.t-wheat { color: var(--lcars-wheat); }
+.t-red-alert-1 { color: var(--lcars-red-alert-1); }
+.t-red-alert-2 { color: var(--lcars-red-alert-2); }
+.t-red-alert-pale { color: var(--lcars-red-alert-pale); }
+.t-yellow-alert-1 { color: var(--lcars-yellow-alert-1); }
+.t-yellow-alert-2 { color: var(--lcars-yellow-alert-2); }
+.t-yellow-alert-pale { color: var(--lcars-yellow-alert-pale); }
+
+.c-blue-bell { --c: var(--lcars-blue-bell); }
+.c-melrose { --c: var(--lcars-melrose); }
+.c-lilac { --c: var(--lcars-lilac); }
+.c-hopbush { --c: var(--lcars-hopbush); }
+.c-chestnut-rose { --c: var(--lcars-chestnut-rose); }
+.c-orange-peel { --c: var(--lcars-orange-peel); }
+.c-atomic-tangerine { --c: var(--lcars-atomic-tangerine); }
+.c-tanoi { --c: var(--lcars-tanoi); }
+.c-golden-tanoi { --c: var(--lcars-golden-tanoi); }
+.c-pale-canary { --c: var(--lcars-pale-canary); }
+.c-neon-carrot { --c: var(--lcars-neon-carrot); }
+.c-eggplant { --c: var(--lcars-eggplant); }
+.c-anakiwa { --c: var(--lcars-anakiwa); }
+.c-mariner { --c: var(--lcars-mariner); }
+.c-bahama-blue { --c: var(--lcars-bahama-blue); }
+.c-danub { --c: var(--lcars-danub); }
+.c-indigo { --c: var(--lcars-indigo); }
+.c-lavender-purple { --c: var(--lcars-lavender-purple); }
+.c-cosmic { --c: var(--lcars-cosmic); }
+.c-red-damask { --c: var(--lcars-red-damask); }
+.c-medium-carmine { --c: var(--lcars-medium-carmine); }
+.c-bourbon { --c: var(--lcars-bourbon); }
+.c-sandy-brown { --c: var(--lcars-sandy-brown); }
+.c-andorian-blue { --c: var(--lcars-andorian-blue); }
+.c-autumn-leaves { --c: var(--lcars-autumn-leaves); }
+.c-command-gold { --c: var(--lcars-command-gold); }
+.c-flat-dark-earth { --c: var(--lcars-flat-dark-earth); }
+.c-frost { --c: var(--lcars-frost); }
+.c-frozen-pond { --c: var(--lcars-frozen-pond); }
+.c-green-apple { --c: var(--lcars-green-apple); }
+.c-luna { --c: var(--lcars-luna); }
+.c-pewter { --c: var(--lcars-pewter); }
+.c-pumpkin-seed { --c: var(--lcars-pumpkin-seed); }
+.c-red-alert { --c: var(--lcars-red-alert); }
+.c-rust { --c: var(--lcars-rust); }
+.c-salmon { --c: var(--lcars-salmon); }
+.c-science-blue { --c: var(--lcars-science-blue); }
+.c-silver { --c: var(--lcars-silver); }
+.c-sky { --c: var(--lcars-sky); }
+.c-smoke { --c: var(--lcars-smoke); }
+.c-fc-mauve { --c: var(--lcars-fc-mauve); }
+.c-fc-terracotta { --c: var(--lcars-fc-terracotta); }
+.c-fc-rose { --c: var(--lcars-fc-rose); }
+.c-fc-plum { --c: var(--lcars-fc-plum); }
+.c-fc-amber { --c: var(--lcars-fc-amber); }
+.c-fc-tan { --c: var(--lcars-fc-tan); }
+.c-fc-olive { --c: var(--lcars-fc-olive); }
+.c-fc-lavender { --c: var(--lcars-fc-lavender); }
+.c-periwinkle { --c: var(--lcars-periwinkle); }
+.c-dodger-pale { --c: var(--lcars-dodger-pale); }
+.c-dodger-soft { --c: var(--lcars-dodger-soft); }
+.c-near-blue { --c: var(--lcars-near-blue); }
+.c-navy-blue { --c: var(--lcars-navy-blue); }
+.c-husk { --c: var(--lcars-husk); }
+.c-nemesis-rust { --c: var(--lcars-nemesis-rust); }
+.c-tamarillo { --c: var(--lcars-tamarillo); }
+.c-nemesis-blue { --c: var(--lcars-nemesis-blue); }
+.c-nemesis-sky { --c: var(--lcars-nemesis-sky); }
+.c-nemesis-ice { --c: var(--lcars-nemesis-ice); }
+.c-nemesis-orange { --c: var(--lcars-nemesis-orange); }
+.c-nemesis-sand { --c: var(--lcars-nemesis-sand); }
+.c-ghost { --c: var(--lcars-ghost); }
+.c-cool { --c: var(--lcars-cool); }
+.c-evening { --c: var(--lcars-evening); }
+.c-midnight { --c: var(--lcars-midnight); }
+.c-moonbeam { --c: var(--lcars-moonbeam); }
+.c-honey { --c: var(--lcars-honey); }
+.c-tangerine { --c: var(--lcars-tangerine); }
+.c-washed-pumpkin { --c: var(--lcars-washed-pumpkin); }
+.c-pumpkin { --c: var(--lcars-pumpkin); }
+.c-cardinal { --c: var(--lcars-cardinal); }
+.c-red-copper { --c: var(--lcars-red-copper); }
+.c-martian { --c: var(--lcars-martian); }
+.c-sand { --c: var(--lcars-sand); }
+.c-wheat { --c: var(--lcars-wheat); }
+.c-red-alert-1 { --c: var(--lcars-red-alert-1); }
+.c-red-alert-2 { --c: var(--lcars-red-alert-2); }
+.c-red-alert-pale { --c: var(--lcars-red-alert-pale); }
+.c-yellow-alert-1 { --c: var(--lcars-yellow-alert-1); }
+.c-yellow-alert-2 { --c: var(--lcars-yellow-alert-2); }
+.c-yellow-alert-pale { --c: var(--lcars-yellow-alert-pale); }

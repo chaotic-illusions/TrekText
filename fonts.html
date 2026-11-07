@@ -41,12 +41,12 @@
     </header>
 
     <main>
-      <p>All fonts below are free (SIL Open Font License) via Google Fonts. Pick one to try it in the live PADD. They are ordered from most to least condensed.</p>
+      <p>Apart from Helvetica Ultra Compressed, all fonts below are free (SIL Open Font License) via Google Fonts. Pick one to try it in the live PADD. They are ordered from most to least condensed.</p>
 
       <trek-padd id="padd" hold="0" muted></trek-padd>
 
       <div class="controls">
-        <label>Size <input type="range" id="size" min="14" max="36" value="22"> <span id="size-out">22px</span></label>
+        <label>Size <input type="range" id="size" min="14" max="40" value="26"> <span id="size-out">26px</span></label>
         <pre class="css" id="css"></pre>
       </div>
 
@@ -56,6 +56,7 @@
 
   <script>
     const FONTS = [
+      { family: "Helvetica Ultra Compressed", weight: 400, note: "The face Michael Okuda used for TNG. Commercial: only shows if you have a licensed copy in fonts/ or installed." },
       { family: "League Gothic", weight: 400, note: "Very condensed. Closest to the original 2002 bitmap font." },
       { family: "Pathway Gothic One", weight: 400, note: "Very condensed, lighter strokes." },
       { family: "Antonio", weight: 400, note: "Condensed. The usual choice for LCARS fan sites." },
@@ -81,7 +82,7 @@
     const cards = document.getElementById("cards");
     padd.text = SAMPLE + "\n\n" + SAMPLE;
 
-    let current = FONTS[2];
+    let current = FONTS[0];
     function apply() {
       padd.style.setProperty("--padd-font", `"${current.family}", sans-serif`);
       padd.style.setProperty("--padd-font-weight", current.weight);

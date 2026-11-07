@@ -1,0 +1,324 @@
+/*!
+ * pieces.css: renders LCARS pages made in the TrekText builder.
+ *
+ * A page is a board of grid cells (--cols x --rows, each --cell design px).
+ * Every piece sits on whole cells (--x, --y, --w, --h). The board scales to fit
+ * its screen in both directions, so the composition holds at any size.
+ *
+ * Each piece has an inner .body that holds its shape and content. The body is
+ * --iw x --ih cells and turned by --rot degrees (0, 90, 180 or 270), so
+ * rotated pieces keep their text, curves and rounded ends.
+ */
+
+@font-face {
+  font-family: "Helvetica Ultra Compressed";
+  src: local("Helvetica Ultra Compressed"), local("Helvetica-UltraCompressed"),
+       url("../fonts/Helvetica Ultra Compressed.otf") format("opentype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.lcars-body { margin: 0; background: var(--lcars-bg, #000); }
+
+/* The screen is whatever space the board may use; the board fits inside it. */
+.lcars-screen {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--lcars-bg, #000);
+}
+
+.lcars-board {
+  --cols: 160;
+  --rows: 100;
+  --cell: 6;
+  --u: min(100cqw / (var(--cols) * var(--cell)), 100cqh / (var(--rows) * var(--cell)));
+  --k: calc(var(--cell) * var(--u)); /* one grid cell */
+  position: relative;
+  width: calc(var(--cols) * var(--k));
+  height: calc(var(--rows) * var(--k));
+  font-family: "Helvetica Ultra Compressed", "Antonio", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
+.piece {
+  --c: var(--lcars-atomic-tangerine);
+  --fs: 17; /* label size in design px */
+  --rot: 0;
+  position: absolute;
+  left: calc(var(--x) * var(--k));
+  top: calc(var(--y) * var(--k));
+  width: calc(var(--w) * var(--k));
+  height: calc(var(--h) * var(--k));
+  font-size: calc(var(--fs) * var(--u));
+  text-decoration: none;
+}
+/* Borders count inside sizes (frame brackets and corners rely on this). */
+.piece *, .piece *::before, .piece *::after { box-sizing: border-box; }
+.piece > .body {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--iw, var(--w)) * var(--k));
+  height: calc(var(--ih, var(--h)) * var(--k));
+  transform: translate(-50%, -50%) rotate(calc(var(--rot) * 1deg));
+}
+
+/* Labels: black on color, or colored on black for Text pieces. */
+.body > .label {
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(0.8 * var(--k));
+  color: var(--tc, #000); /* text color; black on filled pieces by default */
+  text-align: center;
+  white-space: pre;
+  overflow: hidden;
+}
+/* One inner text block, so line breaks and colored runs flow together. */
+.body > .label > .lt { display: block; min-width: 0; }
+.v-top > .body > .label { align-items: flex-start; padding-top: calc(0.6 * var(--k)); }
+.v-bottom > .body > .label { align-items: flex-end; padding-bottom: calc(0.6 * var(--k)); }
+.h-left > .body > .label { justify-content: flex-start; text-align: left; }
+.h-right > .body > .label { justify-content: flex-end; text-align: right; }
+
+.lcars-dot {
+  display: inline-block;
+  width: 0.16em; height: 0.16em;
+  margin: 0 0.3em;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 0.276em;
+}
+
+/* Block: a rectangle, optionally with rounded ends. */
+.p-block > .body, .p-button > .body { background: var(--c); }
+.ends-left > .body, .ends-right > .body, .ends-both > .body, .ends-top > .body, .ends-bottom > .body {
+  --r: calc(min(var(--iw, var(--w)), var(--ih, var(--h))) * var(--k) / 2);
+}
+.ends-left > .body { border-radius: var(--r) 0 0 var(--r); }
+.ends-right > .body { border-radius: 0 var(--r) var(--r) 0; }
+.ends-both > .body { border-radius: var(--r); }
+.ends-top > .body { border-radius: var(--r) var(--r) 0 0; }
+.ends-bottom > .body { border-radius: 0 0 var(--r) var(--r); }
+
+/* Button: a block that links somewhere, with hover and pressed colors. */
+.p-button { cursor: pointer; }
+.p-button > .body { transition: background-color 0.12s; }
+.p-button:hover > .body, .p-button:focus-visible > .body { background: var(--c-hover, color-mix(in srgb, var(--c) 72%, #fff)); }
+.p-button:active > .body { background: var(--c-active, color-mix(in srgb, var(--c) 75%, #000)); }
+.p-button:focus-visible { outline: calc(2 * var(--u)) solid #fff; outline-offset: calc(2 * var(--u)); }
+
+/* Elbow ("shape of doom"): drawn as SVG so both curves stay exact. */
+.p-elbow > .body > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.p-elbow > .body > svg path { fill: var(--c); }
+/* Its label sits in the sidebar (--S cells wide, beside the --B-cell bar). */
+.p-elbow > .body > .label { inset: auto; width: calc(var(--S) * var(--k)); }
+.corner-tl > .body > .label, .corner-bl > .body > .label { left: 0; }
+.corner-tr > .body > .label, .corner-br > .body > .label { right: 0; }
+.corner-tl > .body > .label, .corner-tr > .body > .label { top: calc(var(--B) * var(--k)); bottom: 0; }
+.corner-bl > .body > .label, .corner-br > .body > .label { top: 0; bottom: calc(var(--B) * var(--k)); }
+
+/* Text: colored lettering on black, e.g. a title in a bar's gap. */
+.p-text > .body > .label { color: var(--tc, var(--c)); padding: 0 calc(0.4 * var(--k)); }
+
+/* PADD holder. */
+.p-padd > .body > trek-padd {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  --padd-font-size: calc(var(--fs) * var(--u));
+  --padd-padding: calc(0.5 * var(--k)) calc(0.8 * var(--k));
+}
+
+/* Image, with an optional thin border and a caption underneath. */
+.p-image > .body { display: flex; flex-direction: column; }
+.p-image .img-box { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.p-image .img-box > img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.p-image.bordered .img-box { border: calc(2 * var(--u)) solid var(--bc); }
+.p-image.empty .img-box { outline: 1px dashed #555; outline-offset: -1px; }
+.p-image .caption {
+  flex: none;
+  padding-top: calc(0.5 * var(--k));
+  color: var(--tc, var(--lcars-melrose));
+  text-align: center;
+  white-space: pre;
+}
+
+/* Text that wraps inside its box, for paragraphs. */
+.p-text.wrap > .body > .label { white-space: pre-wrap; line-height: 1.2; }
+.p-text.wrap > .body > .label > .lt { width: 100%; }
+
+/* Blinking ("blinkies"). */
+.blink-slow > .body { animation: lcars-blink 2s infinite; }
+.blink-normal > .body { animation: lcars-blink 1s infinite; }
+.blink-fast > .body { animation: lcars-blink 0.5s infinite; }
+@keyframes lcars-blink {
+  0% { opacity: 1; animation-timing-function: steps(1, end); }
+  50% { opacity: 0.15; animation-timing-function: steps(1, end); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Image sizing, shared by Image and Frame pieces:
+ *   img-keep  the piece keeps the picture's proportions (set by the builder)
+ *   img-crop  fill the space and crop, with --zoom and --px/--py position (%)
+ *   img-fit   show the whole picture
+ * ------------------------------------------------------------------ */
+.img-keep img { object-fit: cover; }
+.img-fit img { object-fit: contain; }
+.img-crop img {
+  object-fit: cover;
+  object-position: calc(var(--px, 50) * 1%) calc(var(--py, 50) * 1%);
+  transform: scale(var(--zoom, 1));
+  transform-origin: calc(var(--px, 50) * 1%) calc(var(--py, 50) * 1%);
+}
+
+/* ------------------------------------------------------------------ *
+ * Frame: an LCARS surround that holds an image, with a title and a
+ * description. One thickness (--fb cells) for the side and the bars.
+ * --c main, --c2 accent (cap, notch, outline), --c3 second accent.
+ *
+ *   ╭──────────────── TITLE ─╮
+ *   │ ╭──────────────────╮
+ *   │ │      image       │
+ *   ▪ │                  │
+ *   │ ╰──────────────────╯
+ *   ╰── ▬▬ ▬ ▮ ▮ ──── DESCRIPTION ─╯
+ * ------------------------------------------------------------------ */
+.p-frame > .body {
+  --t: calc(var(--fb, 3) * var(--k)); /* thickness of every section */
+  --g: var(--k);                      /* gap between sections */
+  --arm: calc(4 * var(--k));          /* how far the bracket reaches along the bars */
+  --ri: calc(1.5 * var(--k));         /* inner curve */
+  --pad: calc(0.75 * var(--k));       /* outline to picture */
+  --line: calc(2 * var(--u));         /* outline weight */
+}
+.p-frame .f-row { position: absolute; display: flex; gap: var(--g); height: var(--t); }
+.p-frame .f-row.top { top: 0; }
+.p-frame .f-row.bottom { bottom: 0; }
+.p-frame .f-seg { flex: 1 1 0; min-width: var(--k); background: var(--c); }
+.p-frame .f-seg.c2 { flex: 0 0 calc(4 * var(--k)); background: var(--c2, var(--c)); }
+.p-frame .f-seg.c3 { flex: 0 0 calc(7 * var(--k)); background: var(--c3, var(--c)); }
+.p-frame .f-seg.sliver { flex: 0 0 calc(0.75 * var(--k)); background: var(--c2, var(--c)); }
+.p-frame .f-cap { flex: 0 0 calc(var(--t) * 1.2); background: var(--c2, var(--c)); }
+.p-frame .f-cap.r { border-radius: 0 var(--t) var(--t) 0; }
+.p-frame .f-cap.l { border-radius: var(--t) 0 0 var(--t); }
+.p-frame .f-text {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0 calc(0.5 * var(--k));
+  color: var(--tc, var(--c));
+  white-space: pre;
+}
+
+/* The bracket: a side and two arms in one, with even thickness and round corners. */
+.p-frame .f-bracket { position: absolute; top: 0; bottom: 0; width: calc(var(--t) + var(--arm)); border: 0 solid var(--c); }
+.p-frame .f-bracket.l { left: 0; border-width: var(--t) 0 var(--t) var(--t); border-radius: calc(var(--t) + var(--ri)) 0 0 calc(var(--t) + var(--ri)); }
+.p-frame .f-bracket.r { right: 0; border-width: var(--t) var(--t) var(--t) 0; border-radius: 0 calc(var(--t) + var(--ri)) calc(var(--t) + var(--ri)) 0; }
+
+/* A notch in the side: a short accent block between two gaps. */
+.p-frame .f-notch {
+  position: absolute;
+  top: 58%;
+  width: var(--t);
+  height: calc(2 * var(--t) + 2 * var(--g));
+  background: var(--lcars-bg, #000);
+}
+.p-frame .f-notch::after { content: ""; position: absolute; inset: var(--g) 0; background: var(--c2, var(--c)); }
+.p-frame .f-notch.l { left: 0; }
+.p-frame .f-notch.r { right: 0; }
+
+/* Viewscreen corners. */
+.p-frame .f-corner { position: absolute; width: calc(6 * var(--k)); height: calc(6 * var(--k)); border: 0 solid var(--c); }
+.p-frame .f-corner.tl { top: 0; left: 0; border-width: var(--t) 0 0 var(--t); border-top-left-radius: calc(var(--t) + var(--ri)); }
+.p-frame .f-corner.tr { top: 0; right: 0; border-width: var(--t) var(--t) 0 0; border-top-right-radius: calc(var(--t) + var(--ri)); }
+.p-frame .f-corner.bl { bottom: 0; left: 0; border-width: 0 0 var(--t) var(--t); border-bottom-left-radius: calc(var(--t) + var(--ri)); border-color: var(--c3, var(--c)); }
+.p-frame .f-corner.br { bottom: 0; right: 0; border-width: 0 var(--t) var(--t) 0; border-bottom-right-radius: calc(var(--t) + var(--ri)); border-color: var(--c3, var(--c)); }
+
+/* The picture sits inside a thin rounded outline; nothing ever scrolls. */
+.p-frame .f-outline {
+  position: absolute;
+  top: calc(var(--t) + var(--g));
+  bottom: calc(var(--t) + var(--g));
+  border: var(--line) solid var(--c2, var(--c));
+  border-radius: calc(1.5 * var(--k));
+}
+.p-frame .f-img {
+  position: absolute;
+  top: calc(var(--t) + var(--g) + var(--pad));
+  bottom: calc(var(--t) + var(--g) + var(--pad));
+  overflow: hidden;
+  border-radius: var(--k);
+}
+.p-frame .f-img > img { display: block; width: 100%; height: 100%; }
+
+/* Where the sections go, per layout. "Closed" sides have the bracket. */
+.f-bracket-left .f-row { left: calc(var(--t) + var(--arm) + var(--g)); right: 0; }
+.f-bracket-right .f-row { left: 0; right: calc(var(--t) + var(--arm) + var(--g)); }
+.f-twin .f-row { left: calc(var(--t) + var(--arm) + var(--g)); right: calc(var(--t) + var(--arm) + var(--g)); }
+.f-viewscreen .f-row { left: calc(6 * var(--k) + var(--g)); right: calc(6 * var(--k) + var(--g)); }
+
+.f-bracket-left .f-outline { left: calc(var(--t) + var(--g)); right: var(--g); }
+.f-bracket-right .f-outline { left: var(--g); right: calc(var(--t) + var(--g)); }
+.f-twin .f-outline, .f-viewscreen .f-outline { left: calc(var(--t) + var(--g)); right: calc(var(--t) + var(--g)); }
+.f-bracket-left .f-img { left: calc(var(--t) + var(--g) + var(--pad)); right: calc(var(--g) + var(--pad)); }
+.f-bracket-right .f-img { left: calc(var(--g) + var(--pad)); right: calc(var(--t) + var(--g) + var(--pad)); }
+.f-twin .f-img, .f-viewscreen .f-img { left: calc(var(--t) + var(--g) + var(--pad)); right: calc(var(--t) + var(--g) + var(--pad)); }
+
+/* ------------------------------------------------------------------ *
+ * Quote, text bar, list and data cascade
+ * ------------------------------------------------------------------ */
+.p-quote > .body { display: flex; gap: calc(1.2 * var(--k)); }
+.p-quote .q-bar { flex: 0 0 var(--k); border-radius: var(--k); background: var(--c); }
+.p-quote .q-text {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+  color: var(--tc, var(--lcars-melrose));
+  white-space: pre-wrap;
+  line-height: 1.25;
+}
+
+.p-textbar > .body { display: flex; gap: calc(0.7 * var(--k)); }
+.p-textbar .tb-cap { flex: 0 0 calc(var(--ih, var(--h)) * var(--k) * 1.2); background: var(--c2, var(--c)); }
+.p-textbar .tb-cap.l { border-radius: 999px 0 0 999px; }
+.p-textbar .tb-cap.r { border-radius: 0 999px 999px 0; }
+.p-textbar .tb-bar { flex: 1; background: var(--c); }
+.p-textbar .tb-text { flex: none; display: flex; align-items: center; color: var(--tc, var(--c)); white-space: pre; }
+
+.p-list > .body { display: flex; flex-direction: column; justify-content: center; gap: calc(0.6 * var(--k)); color: var(--tc, var(--lcars-melrose)); }
+.p-list .li { display: flex; align-items: center; gap: calc(1 * var(--k)); white-space: pre-wrap; }
+.p-list .li::before { content: ""; flex: none; width: 1.7em; height: 0.95em; border-radius: 50%; background: var(--c); }
+
+.p-cascade > .body {
+  display: flex;
+  justify-content: flex-end;
+  gap: calc(0.9 * var(--k));
+  overflow: hidden;
+  color: var(--c);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+.p-cascade .cc { display: flex; flex-direction: column; flex: none; text-align: right; }
+.p-cascade .cc .hl { color: var(--c2, #fff); }
+.p-cascade.animate .cc { animation: lcars-cascade var(--d, 10s) linear infinite; }
+/* Columns drift at different speeds. */
+.p-cascade .cc:nth-child(2n) { --d: 14s; }
+.p-cascade .cc:nth-child(3n) { --d: 7s; }
+.p-cascade .cc:nth-child(5n) { --d: 18s; }
+.p-cascade .cc:nth-child(7n) { --d: 11s; }
+@keyframes lcars-cascade { to { transform: translateY(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .blink-slow > .body, .blink-normal > .body, .blink-fast > .body, .p-cascade.animate .cc { animation: none; }
+}

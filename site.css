@@ -1,4 +1,18 @@
 /* Shared styling for the TrekText demo pages (not needed by the component). */
+
+/*
+ * Helvetica Ultra Compressed is the face Michael Okuda used for TNG's LCARS.
+ * It is a commercial font and is NOT included in this repository: drop your
+ * own licensed copy in fonts/ (git-ignored) or install it on your system.
+ * Without it, pages fall back to Antonio.
+ */
+@font-face {
+  font-family: "Helvetica Ultra Compressed";
+  src: local("Helvetica Ultra Compressed"), local("Helvetica-UltraCompressed"),
+       url("fonts/Helvetica Ultra Compressed.otf") format("opentype");
+  font-weight: 100 900;
+  font-display: swap;
+}
 :root {
   color-scheme: dark;
   --orange: #FF9900;

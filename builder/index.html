@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LCARS Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio&display=swap">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../lcars/palette.css">
+  <link rel="stylesheet" href="../lcars/pieces.css">
+  <link rel="stylesheet" href="builder.css">
+  <script src="../trek-padd.js"></script>
+  <script src="../palette-data.js"></script>
+  <script src="builder.js" defer></script>
+</head>
+<body class="builder show-grid">
+  <header class="topbar">
+    <span class="pill orange title">LCARS Builder</span>
+    <span class="fill"></span>
+    <button type="button" class="pill dkblue" data-cmd="prefs">Preferences</button>
+    <button type="button" class="pill lilac" data-cmd="new">New</button>
+    <button type="button" class="pill lilac" data-cmd="template">Template</button>
+    <button type="button" class="pill blue" data-cmd="open">Open</button>
+    <button type="button" class="pill blue" data-cmd="save">Save</button>
+    <button type="button" class="pill peach" data-cmd="preview">Preview</button>
+    <button type="button" class="pill orange" data-cmd="export">Export</button>
+    <input type="file" id="open-file" accept=".json,application/json" hidden>
+  </header>
+
+  <div class="workspace">
+    <aside class="tools" aria-label="Pieces">
+      <h2>Pieces</h2>
+      <button type="button" class="tool" draggable="true" data-type="block" style="--c: var(--lcars-blue-bell)">Block</button>
+      <button type="button" class="tool" draggable="true" data-type="button" style="--c: var(--lcars-atomic-tangerine)">Button</button>
+      <button type="button" class="tool" draggable="true" data-type="elbow" style="--c: var(--lcars-chestnut-rose)">Elbow</button>
+      <button type="button" class="tool" draggable="true" data-type="text" style="--c: var(--lcars-tanoi)">Text</button>
+      <button type="button" class="tool" draggable="true" data-type="padd" style="--c: var(--lcars-melrose)">PADD</button>
+      <button type="button" class="tool" draggable="true" data-type="image" style="--c: var(--lcars-lilac)">Image</button>
+      <button type="button" class="tool" draggable="true" data-type="frame" style="--c: var(--lcars-orange-peel)">Frame</button>
+      <button type="button" class="tool" draggable="true" data-type="textbar" style="--c: var(--lcars-golden-tanoi)">Text Bar</button>
+      <button type="button" class="tool" draggable="true" data-type="quote" style="--c: var(--lcars-hopbush)">Quote</button>
+      <button type="button" class="tool" draggable="true" data-type="list" style="--c: var(--lcars-blue-bell)">List</button>
+      <button type="button" class="tool" draggable="true" data-type="cascade" style="--c: var(--lcars-sandy-brown)">Cascade</button>
+      <p class="hint">Drag a piece onto the board, or click to add it in the middle.</p>
+      <h2>View</h2>
+      <label class="toggle"><input type="checkbox" id="grid-toggle" checked> Grid</label>
+    </aside>
+
+    <main class="stage" id="stage">
+      <div class="lcars-screen"><div class="lcars-board" id="board"></div></div>
+    </main>
+
+    <aside class="inspector" id="inspector" aria-label="Properties"></aside>
+  </div>
+
+  <dialog id="prefs" class="prefs" aria-labelledby="prefs-title">
+    <form method="dialog">
+      <header class="prefs-head">
+        <span class="pill orange title" id="prefs-title">Preferences</span>
+        <span class="fill"></span>
+        <button class="pill blue" value="done">Done</button>
+      </header>
+      <h2>Colors in the pickers</h2>
+      <p class="note">Tick the colors you want offered when choosing piece and letter colors. Your picks are outlined.
+        Any LCARS color can still be used by name in text, as ##{name}.</p>
+      <div class="prefs-actions">
+        <button type="button" class="pill lilac" data-prefs="picks">Reset to my picks</button>
+        <button type="button" class="pill dkblue" data-prefs="all">All</button>
+        <button type="button" class="pill dkblue" data-prefs="none">None</button>
+        <span id="prefs-count"></span>
+      </div>
+      <div id="prefs-colors"></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>

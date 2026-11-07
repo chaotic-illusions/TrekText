@@ -1,0 +1,291 @@
+/*!
+ * lcars.css: LCARS-style layout elements, pure CSS with no images.
+ * Part of TrekText. An original implementation inspired by the TNG-era
+ * computer displays.
+ *
+ * Everything is measured in --u, one "design pixel". It scales with the
+ * viewport, so a layout drawn at about 1000px wide keeps its proportions at
+ * any size, while content areas stretch to fill the screen.
+ *
+ * Color: set --c on any element, or use a .c-<name> class from palette.css. Buttons also take
+ * --c-hover and --c-active.
+ */
+
+/* Commercial font: not included in the repo. Falls back to Antonio. */
+@font-face {
+  font-family: "Helvetica Ultra Compressed";
+  src: local("Helvetica Ultra Compressed"), local("Helvetica-UltraCompressed"),
+       url("../fonts/Helvetica Ultra Compressed.otf") format("opentype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Colors (--lcars-<name> and the .c-<name> classes) come from palette.css. */
+:root {
+  --lcars-bg: #000;
+  --lcars-font: "Helvetica Ultra Compressed", "Antonio", "Arial Narrow", sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ * Root and scale
+ * ------------------------------------------------------------------ */
+
+.lcars {
+  /* 1 design px: 1:1 in a 1000x645 window, scaled to fit both width and height. */
+  --u: clamp(0.8px, min(0.1vw, 0.155vh), 1.8px);
+  --gap: calc(6 * var(--u));
+  --bar: calc(23 * var(--u)); /* thickness of bars, caps and buttons */
+  --side: calc(150 * var(--u)); /* frame sidebar width */
+  --arm: calc(78 * var(--u)); /* how far an elbow reaches along its bar */
+  --outer-x: calc(64 * var(--u)); /* outer elbow curve */
+  --outer-y: calc(46 * var(--u));
+  --inner: calc(26 * var(--u)); /* inner elbow curve */
+  --btn-w: calc(69 * var(--u));
+  --label: calc(17 * var(--u)); /* label text size */
+
+  margin: 0;
+  background: var(--lcars-bg);
+  color: var(--lcars-melrose);
+  font-family: var(--lcars-font);
+  font-size: calc(20 * var(--u));
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  text-transform: uppercase; /* LCARS never used lowercase */
+}
+.lcars *, .lcars *::before, .lcars *::after { box-sizing: border-box; }
+
+/* Page grid: a button column beside a stack of frames, bars across the top and bottom. */
+.lcars-page {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--gap) calc(5 * var(--u));
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: calc(10 * var(--u)) calc(16 * var(--u));
+}
+.lcars-page > .span-all { grid-column: 1 / -1; }
+
+/* ------------------------------------------------------------------ *
+ * Bars, caps and titles
+ * ------------------------------------------------------------------ */
+
+.lcars-bar {
+  display: flex;
+  align-items: stretch;
+  gap: calc(4 * var(--u));
+  height: var(--bar);
+  min-width: 0;
+}
+.lcars-seg { background: var(--c, var(--lcars-blue-bell)); flex: 0 0 auto; min-width: var(--bar); }
+.lcars-seg.grow { flex: 1 1 0; }
+.lcars-cap { background: var(--c, var(--lcars-lilac)); flex: 0 0 var(--bar); }
+.lcars-cap.left { border-radius: calc(var(--bar) / 2) 0 0 calc(var(--bar) / 2); }
+.lcars-cap.right { border-radius: 0 calc(var(--bar) / 2) calc(var(--bar) / 2) 0; }
+
+.lcars-title {
+  margin: 0;
+  padding: 0 calc(3 * var(--u));
+  color: var(--c, var(--lcars-atomic-tangerine));
+  font-size: calc(var(--bar) * 0.98);
+  font-weight: 400;
+  line-height: calc(var(--bar) * 1.08); /* sits the capitals slightly low, as on screen */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.lcars-dot {
+  display: inline-block;
+  width: 0.16em; height: 0.16em;
+  margin: 0 0.3em;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 0.276em; /* centred on the cap height */
+}
+
+/* ------------------------------------------------------------------ *
+ * Buttons
+ * ------------------------------------------------------------------ */
+
+.lcars-buttons {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), var(--btn-w));
+  grid-auto-rows: var(--bar);
+  gap: var(--gap) calc(9 * var(--u));
+  align-content: start;
+}
+
+.lcars-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--btn-w);
+  height: var(--bar);
+  padding: 0 calc(8 * var(--u));
+  border: 0;
+  border-radius: calc(var(--bar) / 2);
+  background: var(--c, var(--lcars-atomic-tangerine));
+  color: #000;
+  font: inherit;
+  font-size: var(--label);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+.lcars-btn:hover,
+.lcars-btn:focus-visible { background: var(--c-hover, color-mix(in srgb, var(--c, var(--lcars-atomic-tangerine)) 72%, #fff)); }
+.lcars-btn:active { background: var(--c-active, color-mix(in srgb, var(--c, var(--lcars-atomic-tangerine)) 75%, #000)); }
+.lcars-btn:focus-visible { outline: calc(2 * var(--u)) solid #fff; outline-offset: calc(2 * var(--u)); }
+.lcars-btn.blank { visibility: hidden; }
+.lcars-btn.end { justify-content: flex-end; }
+.lcars-btn.start { justify-content: flex-start; }
+.lcars-btn.shape-left { border-radius: calc(var(--bar) / 2) 0 0 calc(var(--bar) / 2); }
+.lcars-btn.shape-right { border-radius: 0 calc(var(--bar) / 2) calc(var(--bar) / 2) 0; }
+.lcars-btn.shape-square { border-radius: 0; }
+
+/* ------------------------------------------------------------------ *
+ * Frames: a sidebar joined to top and bottom bars by elbows
+ *
+ *   ┌── elbow-top ──arm──┐ gap ┌──── top bars ────┐
+ *   │ side │  content area (stretches)            │
+ *   └── elbow-bottom ─arm┘ gap └── bottom bars ───┘
+ * ------------------------------------------------------------------ */
+
+.lcars-frame {
+  display: grid;
+  grid-template-columns: var(--side) var(--arm) minmax(0, 1fr);
+  grid-template-rows: var(--bar) minmax(0, 1fr) var(--bar);
+  min-width: 0;
+}
+
+.lcars-frame.fill { min-height: calc(320 * var(--u)); } /* a frame that takes the spare height */
+
+.lcars-frame > .side {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  position: relative;
+  z-index: 1; /* elbow arms and inner curves draw over the content area */
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+.side > .seg {
+  position: relative;
+  flex: 1 1 0;
+  min-height: calc(30 * var(--u));
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: calc(4 * var(--u)) calc(5 * var(--u));
+  background: var(--c, var(--lcars-blue-bell));
+  color: #000;
+  font-size: var(--label);
+  line-height: 1;
+  text-align: right;
+}
+.side > .seg.fixed { flex: 0 0 auto; }
+
+/* Top elbow: rounded outer corner, an arm along the top bar, and an inner curve. */
+.side > .elbow-top {
+  min-height: calc(var(--bar) + var(--inner) + var(--outer-y));
+  border-top-left-radius: var(--outer-x) var(--outer-y);
+}
+.side > .elbow-top::before,
+.side > .elbow-bottom::before {
+  content: "";
+  position: absolute;
+  left: 100%;
+  width: var(--arm);
+  height: var(--bar);
+  background: inherit;
+}
+.side > .elbow-top::before { top: 0; }
+.side > .elbow-top::after,
+.side > .elbow-bottom::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  width: var(--inner);
+  height: var(--inner);
+}
+.side > .elbow-top::after {
+  top: var(--bar);
+  background: radial-gradient(circle at 100% 100%, transparent var(--inner), var(--c, var(--lcars-blue-bell)) calc(var(--inner) + 0.5px));
+}
+
+/* Bottom elbow: the mirror image. */
+.side > .elbow-bottom {
+  min-height: calc(var(--bar) + var(--inner) + var(--outer-y));
+  border-bottom-left-radius: var(--outer-x) var(--outer-y);
+}
+.side > .elbow-bottom::before { bottom: 0; }
+.side > .elbow-bottom::after {
+  bottom: var(--bar);
+  background: radial-gradient(circle at 100% 0%, transparent var(--inner), var(--c, var(--lcars-blue-bell)) calc(var(--inner) + 0.5px));
+}
+
+.lcars-frame > .top,
+.lcars-frame > .bottom {
+  grid-column: 3;
+  display: flex;
+  gap: var(--gap);
+  padding-left: var(--gap);
+}
+.lcars-frame > .top { grid-row: 1; }
+.lcars-frame > .bottom { grid-row: 3; }
+.lcars-frame > .top > *,
+.lcars-frame > .bottom > * { flex: 1 1 0; background: var(--c, var(--lcars-blue-bell)); }
+.lcars-frame > .top > .fixed,
+.lcars-frame > .bottom > .fixed { flex: 0 0 auto; }
+
+.lcars-frame > .content {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: calc(6 * var(--u)) 0 calc(6 * var(--u)) calc(12 * var(--u));
+}
+
+/* ------------------------------------------------------------------ *
+ * Content holders
+ * ------------------------------------------------------------------ */
+
+.lcars-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* A <trek-padd> that fills its frame's content area. */
+.lcars-frame > .content > trek-padd {
+  position: absolute;
+  inset: calc(6 * var(--u)) 0 calc(6 * var(--u)) calc(12 * var(--u));
+  height: auto;
+  --padd-font-size: calc(24 * var(--u));
+  --padd-padding: 0 calc(8 * var(--u)) 0 calc(4 * var(--u));
+}
+
+/* ------------------------------------------------------------------ *
+ * Narrow screens: one column, wrapping buttons, slimmer frames
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+  .lcars {
+    --side: calc(54 * var(--u));
+    --arm: calc(30 * var(--u));
+    --outer-x: calc(40 * var(--u));
+    --outer-y: calc(34 * var(--u));
+    --inner: calc(18 * var(--u));
+  }
+  .lcars-page { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; align-content: start; }
+  .lcars-frame.fill { min-height: 60vh; min-height: 60dvh; }
+  .lcars-buttons { display: flex; flex-wrap: wrap; padding-top: 0 !important; }
+  .lcars-btn.blank { display: none; }
+  .side > .seg { font-size: 0; } /* labels don't fit a slim sidebar */
+  .lcars-title.optional { display: none; }
+}

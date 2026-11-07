@@ -1,0 +1,387 @@
+/*
+ * LCARS motion: ambient effects, button presses, power-up entrances,
+ * indicators and alert conditions.
+ *
+ * Every effect is a class. On a builder piece the class goes on .piece and
+ * animates its .body; anywhere else it animates the element itself. Colors
+ * come from the same variables the pieces use: --c (fill), --c2 (accent),
+ * --mc (the second color for Shift), and --lcars-* from palette.css.
+ *
+ * Speed: add .m-slow or .m-fast to an element or any ancestor.
+ * Turning motion off: the visitor's "reduce motion" setting, or .m-still on
+ * any ancestor, stops everything (pages then appear fully drawn).
+ */
+
+.m-slow { --m-rate: 1.8; }
+.m-fast { --m-rate: 0.5; }
+
+/* ------------------------------------------------------------------ *
+ * Ambient
+ * ------------------------------------------------------------------ */
+
+/* Pulse: the fill dims and recovers, like a panel drawing power. */
+.m-pulse:not(.piece), .piece.m-pulse > .body {
+  animation: m-pulse calc(2.4s * var(--m-rate, 1)) ease-in-out infinite;
+}
+@keyframes m-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(0.45); } }
+
+/* Flicker: an unsteady panel that drops out now and then. */
+.m-flicker:not(.piece), .piece.m-flicker > .body {
+  animation: m-flicker calc(5.3s * var(--m-rate, 1)) linear infinite;
+}
+@keyframes m-flicker {
+  0%, 11%, 13.5%, 47%, 48.4%, 50%, 77%, 79%, 100% { opacity: 1; }
+  12% { opacity: 0.3; }
+  47.6% { opacity: 0.55; }
+  49.2% { opacity: 0.12; }
+  78% { opacity: 0.4; }
+}
+
+/* Shift: the fill snaps to the second color (--mc) and back. */
+.m-shift:not(.piece) { --c: var(--c0); }
+.piece.m-shift { --c0: var(--c); }
+.m-shift:not(.piece), .piece.m-shift > .body {
+  animation: m-shift calc(6s * var(--m-rate, 1)) linear infinite;
+}
+@keyframes m-shift {
+  0%, 52% { --c: var(--c0); }
+  52.01%, 83% { --c: var(--mc, var(--lcars-frozen-pond)); }
+  83.01%, 100% { --c: var(--c0); }
+}
+
+/* Shimmer: a band of light sweeps across, then waits. */
+.m-shimmer:not(.piece), .piece.m-shimmer > .body { position: relative; overflow: hidden; }
+.m-shimmer:not(.piece)::after, .piece.m-shimmer > .body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 0.42) 50%, transparent 75%) no-repeat;
+  background-size: 45% 100%;
+  animation: m-shimmer calc(3.6s * var(--m-rate, 1)) ease-in-out infinite;
+}
+@keyframes m-shimmer {
+  0% { background-position: -100% 0; }
+  55%, 100% { background-position: 200% 0; }
+}
+
+/* Flow: soft dark ripples drift along the fill, after the polarized panels on
+   the TNG sets, where only the filled areas seemed to move. */
+.m-flow:not(.piece), .piece.m-flow > .body { position: relative; overflow: hidden; --m-period: 22px; }
+.m-flow:not(.piece)::after, .piece.m-flow > .body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-2 * var(--m-period) / sin(65deg));
+  right: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(115deg,
+    rgb(0 0 0 / 0) 0, rgb(0 0 0 / 0.26) calc(var(--m-period) / 2), rgb(0 0 0 / 0) var(--m-period));
+  animation: m-flow calc(1.4s * var(--m-rate, 1)) linear infinite;
+}
+@keyframes m-flow { to { transform: translateX(calc(var(--m-period) / sin(65deg))); } }
+
+/* Twinkle: scattered numbers in a cascade light up for a moment. */
+.m-twinkle :is(span, b):nth-child(7n + 3),
+.m-twinkle :is(span, b):nth-child(11n + 5),
+.m-twinkle :is(span, b):nth-child(13n + 1) {
+  animation: m-twinkle calc(3.1s * var(--m-rate, 1)) steps(1, end) infinite;
+}
+.m-twinkle :is(span, b):nth-child(11n + 5) { animation-duration: calc(4.3s * var(--m-rate, 1)); animation-delay: -1.7s; }
+.m-twinkle :is(span, b):nth-child(13n + 1) { animation-duration: calc(5.9s * var(--m-rate, 1)); animation-delay: -3.2s; }
+.m-twinkle .cc:nth-child(2n) :is(span, b) { animation-delay: -0.9s; }
+.m-twinkle .cc:nth-child(3n) :is(span, b) { animation-delay: -2.4s; }
+@keyframes m-twinkle {
+  0% { color: inherit; }
+  86% { color: var(--c2, var(--lcars-frozen-pond)); }
+  93% { color: inherit; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Press flash: a button flares bright for an instant when pressed.
+ * motion.js adds .m-flashing on press; without it, :active still shows.
+ * ------------------------------------------------------------------ */
+.m-press:not(.piece).m-flashing, .piece.m-press.m-flashing > .body {
+  animation: m-flash 0.34s ease-out;
+}
+@keyframes m-flash {
+  0% { filter: brightness(2.1) saturate(0.35); }
+  100% { filter: none; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Power-up entrances. They run while an ancestor has .m-booting, which
+ * motion.js adds; it numbers the elements top to bottom, left to right
+ * (--boot-i) so the screen draws on in reading order.
+ * An entrance and an ambient effect can't share one element (each needs
+ * the element's animation): builder pieces take the entrance on .piece and
+ * the ambient effect on .body; elsewhere, wrap one in the other.
+ * ------------------------------------------------------------------ */
+.m-booting :is(.m-in-key, .m-in-wipe-r, .m-in-wipe-l, .m-in-wipe-d, .m-in-wipe-u, .m-in-grow) {
+  animation-iteration-count: 1;
+  animation-duration: calc(0.42s * var(--m-rate, 1));
+  animation-delay: calc(var(--boot-delay, 120ms) + var(--boot-i, 0) * var(--boot-step, 55ms) * var(--m-rate, 1));
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.m-booting .m-in-key { animation-name: m-key; animation-timing-function: linear; }
+.m-booting .m-in-wipe-r { animation-name: m-wipe; --m-from: inset(0 100% 0 0); }
+.m-booting .m-in-wipe-l { animation-name: m-wipe; --m-from: inset(0 0 0 100%); }
+.m-booting .m-in-wipe-d { animation-name: m-wipe; --m-from: inset(0 0 100% 0); }
+.m-booting .m-in-wipe-u { animation-name: m-wipe; --m-from: inset(100% 0 0 0); }
+.m-booting .m-in-grow { animation-name: m-wipe; --m-from: inset(0 50% 0 50%); }
+
+/* Keys on: dark, a stutter, then full brightness. */
+@keyframes m-key {
+  0%, 30% { opacity: 0; }
+  31%, 44% { opacity: 0.65; }
+  45%, 58% { opacity: 0.15; }
+  59%, 100% { opacity: 1; }
+}
+@keyframes m-wipe {
+  from { clip-path: var(--m-from); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Segment meter: a row (or column, .vertical) of segments. motion.js's
+ * LcarsMotion.meter() or the builder writes the <i> segments with --i
+ * (index), --n (count) and --d (distance from the middle).
+ *   .m-comet  a lit segment runs along with a fading tail
+ *   .m-fill   segments light one by one, then drain the same way
+ *   .m-scan   a light runs back and forth
+ *   .m-core   pulses run out from the middle
+ *   .m-level  each segment jumps between levels
+ * ------------------------------------------------------------------ */
+.m-meter {
+  --n: 10;
+  --step: calc(90ms * var(--m-rate, 1));
+  --on: var(--c, var(--lcars-atomic-tangerine));
+  --off: color-mix(in srgb, var(--on) 22%, #000);
+  display: flex;
+  gap: var(--m-gap, 4px);
+}
+.m-meter.vertical { flex-direction: column-reverse; }
+.m-meter > i { flex: 1 1 0; position: relative; border-radius: var(--m-seg-radius, 3px); background: var(--off); }
+.m-meter > i::before, .m-meter > i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--on);
+  opacity: 0;
+}
+.m-meter.round > i:first-child { border-radius: 999px 3px 3px 999px; }
+.m-meter.round > i:last-child { border-radius: 3px 999px 999px 3px; }
+.m-meter.vertical.round > i:first-child { border-radius: 3px 3px 999px 999px; }
+.m-meter.vertical.round > i:last-child { border-radius: 999px 999px 3px 3px; }
+
+.m-comet > i::before {
+  animation: m-trail calc(var(--n) * var(--step)) linear infinite;
+  animation-delay: calc((var(--i) - var(--n)) * var(--step));
+}
+.m-fill > i::before {
+  animation: m-hold calc(2 * var(--n) * var(--step)) steps(1, end) infinite;
+  animation-delay: calc((var(--i) - 2 * var(--n)) * var(--step));
+}
+.m-scan > i::before, .m-scan > i::after {
+  animation: m-trail-short calc((2 * var(--n) - 2) * var(--step)) linear infinite;
+}
+.m-scan > i::before { animation-delay: calc((var(--i) - 2 * var(--n) + 2) * var(--step)); }
+.m-scan > i::after { animation-delay: calc(-1 * var(--i) * var(--step)); }
+.m-core > i::before {
+  animation: m-trail calc((var(--n) / 2 + 2) * var(--step) * 1.6) linear infinite;
+  animation-delay: calc((var(--d) - var(--n) / 2 - 2) * var(--step) * 1.6);
+}
+.m-level > i::before {
+  opacity: 1;
+  transform-origin: 50% 100%;
+  animation: m-level calc(2.3s * var(--m-rate, 1)) steps(1, end) infinite;
+  animation-delay: calc(var(--i) * -0.61s);
+}
+.m-level > i:nth-child(2n)::before { animation-duration: calc(2.9s * var(--m-rate, 1)); }
+.m-level > i:nth-child(3n)::before { animation-duration: calc(1.7s * var(--m-rate, 1)); }
+
+@keyframes m-trail { 0% { opacity: 1; } 32% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes m-trail-short { 0% { opacity: 1; } 16% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes m-hold { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes m-level {
+  0% { transform: scaleY(0.35); }
+  14% { transform: scaleY(0.8); }
+  27% { transform: scaleY(0.55); }
+  41% { transform: scaleY(1); }
+  52% { transform: scaleY(0.2); }
+  66% { transform: scaleY(0.7); }
+  81% { transform: scaleY(0.45); }
+  100% { transform: scaleY(0.35); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Readout: groups of numbers that update on their own (motion.js), with
+ * the odd group lighting up in the accent color.
+ * ------------------------------------------------------------------ */
+.m-readout { color: var(--c, var(--lcars-melrose)); font-variant-numeric: tabular-nums; }
+.m-readout .hot { color: var(--c2, var(--lcars-frozen-pond)); }
+
+/* ------------------------------------------------------------------ *
+ * Sensor scope: rings, a sweeping arm with a fading wake, and contacts
+ * that light as the arm passes. Contacts: <i style="--a: 40; --r: 0.6">,
+ * angle in degrees clockwise from the top, radius from 0 to 1.
+ * ------------------------------------------------------------------ */
+.m-scope {
+  --sweep: calc(4s * var(--m-rate, 1));
+  --ring: var(--c, var(--lcars-blue-bell));
+  --arm: var(--c2, var(--lcars-frozen-pond));
+  container-type: size;
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 0 0 2px var(--ring);
+}
+/* Rings and crosshairs (on a pseudo-element, so cqw measures the scope itself). */
+.m-scope::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--ring), var(--ring)) center / 1px 100% no-repeat,
+    linear-gradient(var(--ring), var(--ring)) center / 100% 1px no-repeat,
+    repeating-radial-gradient(circle closest-side, transparent 0 calc(12.5cqw - 1.5px), var(--ring) calc(12.5cqw - 1.5px) 12.5cqw);
+  opacity: 0.75;
+}
+.m-scope::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 290deg,
+    color-mix(in srgb, var(--arm) 8%, transparent) 300deg, color-mix(in srgb, var(--arm) 55%, transparent) 359deg, var(--arm) 360deg);
+  animation: m-spin var(--sweep) linear infinite;
+}
+.m-scope > i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4.5cqw;
+  height: 4.5cqw;
+  margin: -2.25cqw 0 0 -2.25cqw;
+  border-radius: 50%;
+  background: var(--c3, var(--lcars-atomic-tangerine));
+  transform: rotate(calc(var(--a) * 1deg)) translateY(calc(var(--r) * -50cqw));
+  opacity: 0.15;
+  animation: m-blip var(--sweep) linear infinite;
+  animation-delay: calc(var(--a) / 360 * var(--sweep) - var(--sweep));
+}
+@keyframes m-spin { to { transform: rotate(1turn); } }
+@keyframes m-blip { 0% { opacity: 1; scale: 1.5; } 8% { scale: 1; } 70%, 100% { opacity: 0.15; } }
+
+/* ------------------------------------------------------------------ *
+ * Scan line: a bright line with a glowing wake passes down over an image
+ * or frame, then waits.
+ * ------------------------------------------------------------------ */
+.m-scanline:not(.piece), .piece.m-scanline > .body { position: relative; overflow: hidden; }
+.m-scanline:not(.piece)::after, .piece.m-scanline :is(.f-img, .img-box)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 30%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent,
+    color-mix(in srgb, var(--scan, var(--lcars-frozen-pond)) 22%, transparent) 88%,
+    var(--scan, var(--lcars-frozen-pond)) 97%, transparent);
+  animation: m-scanline calc(4.5s * var(--m-rate, 1)) cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes m-scanline {
+  0% { transform: translateY(-100%); }
+  65%, 100% { transform: translateY(334%); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Alert banner: stacked bars above and below a title, lighting outward
+ * from the middle in waves.
+ *   <div class="m-alert" style="--n: 4">
+ *     <div class="m-al-bars up"><i style="--i:0"></i>...</div>
+ *     <div class="m-al-title">Red alert</div>
+ *     <div class="m-al-bars down"><i style="--i:0"></i>...</div>
+ *   </div>
+ * ------------------------------------------------------------------ */
+.m-alert {
+  --alert: var(--c, var(--lcars-red-alert-2));
+  --beat: calc(1.5s * var(--m-rate, 1));
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+/* Sizes use cqh on the children: on .m-alert itself, cqh would measure the page. */
+.m-al-bars { display: flex; flex-direction: column; align-items: center; gap: 3cqh; width: 100%; }
+.m-al-bars.up { flex-direction: column-reverse; margin-bottom: 5cqh; }
+.m-al-bars.down { margin-top: 5cqh; }
+.m-al-bars > i {
+  display: block;
+  height: calc(40cqh / (2 * var(--n)));
+  width: calc(60% + var(--i) * 40% / var(--n));
+  border-radius: 999px;
+  background: var(--alert);
+  animation: m-al-bar var(--beat) linear infinite;
+  animation-delay: calc(var(--i) * var(--beat) / 8 - var(--beat));
+}
+.m-al-title {
+  color: var(--tc, var(--alert));
+  font-size: 16cqh;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  animation: m-al-title var(--beat) steps(1, end) infinite;
+}
+@keyframes m-al-bar {
+  0% { opacity: 1; transform: scaleX(1); }
+  45% { opacity: 0.18; transform: scaleX(0.9); }
+  100% { opacity: 0.18; transform: scaleX(0.9); }
+}
+@keyframes m-al-title { 0% { opacity: 1; } 70% { opacity: 0.35; } 100% { opacity: 1; } }
+
+/* ------------------------------------------------------------------ *
+ * Alert conditions: data-alert="red" | "yellow" | "blue" on any ancestor
+ * recolors every piece in that condition's colors and makes it throb.
+ * Elements outside the builder opt in with .m-alertable.
+ * ------------------------------------------------------------------ */
+[data-alert] :is(.piece:not(.p-text, .p-padd, .p-image) > .body, .m-alertable) {
+  animation: m-condition calc(1.5s * var(--m-rate, 1)) ease-in-out infinite;
+}
+[data-alert="red"] :is(.piece > .body, .m-alertable) { --c: var(--lcars-red-alert-2); --c2: var(--lcars-cardinal); --c3: var(--lcars-chestnut-rose); }
+[data-alert="red"] :is(.piece:nth-child(3n + 2) > .body, .m-alertable:nth-child(3n + 2)) { --c: var(--lcars-cardinal); }
+[data-alert="red"] :is(.piece:nth-child(3n) > .body, .m-alertable:nth-child(3n)) { --c: var(--lcars-chestnut-rose); }
+[data-alert="yellow"] :is(.piece > .body, .m-alertable) { --c: var(--lcars-yellow-alert-2); --c2: var(--lcars-golden-tanoi); --c3: var(--lcars-tangerine); }
+[data-alert="yellow"] :is(.piece:nth-child(3n + 2) > .body, .m-alertable:nth-child(3n + 2)) { --c: var(--lcars-golden-tanoi); }
+[data-alert="yellow"] :is(.piece:nth-child(3n) > .body, .m-alertable:nth-child(3n)) { --c: var(--lcars-tangerine); }
+[data-alert="blue"] :is(.piece > .body, .m-alertable) { --c: var(--lcars-nemesis-blue); --c2: var(--lcars-ghost); --c3: var(--lcars-andorian-blue); }
+[data-alert="blue"] :is(.piece:nth-child(3n + 2) > .body, .m-alertable:nth-child(3n + 2)) { --c: var(--lcars-ghost); }
+[data-alert="blue"] :is(.piece:nth-child(3n) > .body, .m-alertable:nth-child(3n)) { --c: var(--lcars-andorian-blue); }
+[data-alert="red"] .m-alert { --alert: var(--lcars-red-alert-2); }
+[data-alert="yellow"] .m-alert { --alert: var(--lcars-yellow-alert-2); }
+[data-alert="blue"] .m-alert { --alert: var(--lcars-nemesis-blue); }
+@keyframes m-condition { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(0.6); } }
+
+/* ------------------------------------------------------------------ *
+ * Motion off
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  :is([class^="m-"], [class*=" m-"], [data-alert]),
+  :is([class^="m-"], [class*=" m-"], [data-alert]) :is(*, *::before, *::after),
+  :is([class^="m-"], [class*=" m-"])::before,
+  :is([class^="m-"], [class*=" m-"])::after {
+    animation: none !important;
+  }
+}
+.m-still, .m-still :is(*, *::before, *::after) { animation: none !important; }

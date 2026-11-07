@@ -11,3 +11,12 @@ Thumbs.db
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Commercial fonts: licensed for local use only, never publish
+/fonts/
+
+# Local mockups of crymson.org pages: personal content, never publish
+/mockups/
+
+# Backups written by tools/convert_codes.py
+*.bak
